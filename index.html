@@ -20,27 +20,28 @@
       
       <!-- Pengaturan API & Supabase -->
       <div class="bg-slate-900 p-3 rounded-lg border border-purple-500/30 space-y-2">
-        <h2 class="text-xs text-purple-400 font-bold flex items-center gap-1">
-          ⚙️ Pengaturan API & Supabase (Simpan Sekali)
+        <h2 class="text-xs text-purple-400 font-bold flex items-center justify-between">
+          <span>⚙️ Pengaturan API & Supabase</span>
+          <span class="text-[10px] text-slate-500 font-normal">(Opsional)</span>
         </h2>
         
         <div>
-          <label class="block text-[10px] text-slate-400 mb-0.5">Gemini API Key (Mendukung AQ... / AIza...):</label>
-          <input type="password" id="apiKey" placeholder="Tempelkan Gemini API Key di sini" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500">
+          <label class="block text-[10px] text-slate-400 mb-0.5">Gemini API Key:</label>
+          <input type="password" id="apiKey" placeholder="Kosongkan jika menggunakan sistem default" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500">
         </div>
         
         <div>
-          <label class="block text-[10px] text-slate-400 mb-0.5">Supabase URL (Opsional):</label>
+          <label class="block text-[10px] text-slate-400 mb-0.5">Supabase URL:</label>
           <input type="text" id="sbUrl" placeholder="https://xxx.supabase.co" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500">
         </div>
         
         <div>
-          <label class="block text-[10px] text-slate-400 mb-0.5">Supabase Anon Key (Opsional):</label>
+          <label class="block text-[10px] text-slate-400 mb-0.5">Supabase Anon Key:</label>
           <input type="password" id="sbKey" placeholder="eyJhbGci..." class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500">
         </div>
         
         <button type="button" id="btnSaveConfig" class="w-full bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white font-bold text-xs py-2 rounded transition shadow">
-          💾 Simpan Pengaturan ke HP
+          💾 Simpan Pengaturan Kustom ke HP
         </button>
         <p id="saveNotice" class="text-[11px] text-center font-semibold hidden"></p>
       </div>
@@ -135,9 +136,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    // ===== MASTER CONFIG (UNTUK KOMUNITAS) =====
+    const DEFAULT_SUPABASE_URL = "https://nvjimdkswoxvlnlapibw.supabase.co"; 
+    const DEFAULT_SUPABASE_KEY = ""; // Salin Anon Key Supabase Anda di sini
+    // ============================================
+
     let currentAuditData = null;
 
-    // Helper Fungsi Notifikasi UI
     function showNotice(text, isError = false) {
       const el = document.getElementById('saveNotice');
       el.innerText = text;
@@ -147,54 +152,84 @@
       setTimeout(() => { el.classList.add('hidden'); }, 5000);
     }
 
-    // Load Data awal saat halaman siap
     window.addEventListener('DOMContentLoaded', () => {
       try {
         const savedKey = localStorage.getItem('GEMINI_KEY') || '';
-        const savedUrl = localStorage.getItem('SB_URL') || '';
-        const savedSbKey = localStorage.getItem('SB_KEY') || '';
+        const savedUrl = localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
+        const savedSbKey = localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
 
         if (savedKey) document.getElementById('apiKey').value = savedKey;
-        if (savedUrl) document.getElementById('sbUrl').value = savedUrl;
+        document.getElementById('sbUrl').value = savedUrl;
         if (savedSbKey) document.getElementById('sbKey').value = savedSbKey;
       } catch (e) {
-        console.warn("Storage tidak dapat diakses:", e);
+        console.warn("Storage warning:", e);
       }
 
-      // Explicit Binding Tombol
       document.getElementById('btnSaveConfig').onclick = saveKeys;
       document.getElementById('btnSubmit').onclick = processNFT;
       document.getElementById('btnReloadHistory').onclick = loadAuditHistory;
       document.getElementById('btnCopyReport').onclick = copyAuditText;
       document.getElementById('btnDownloadJson').onclick = downloadJsonAudit;
 
-      // Coba muat riwayat tanpa menghentikan script jika gagal
       setTimeout(loadAuditHistory, 800);
     });
 
-    // 1. Simpan Pengaturan
     function saveKeys() {
       const apiKeyVal = document.getElementById('apiKey').value.trim();
       const sbUrlVal = document.getElementById('sbUrl').value.trim();
       const sbKeyVal = document.getElementById('sbKey').value.trim();
 
-      if (!apiKeyVal) {
-        showNotice("⚠️ Mohon isi Gemini API Key terlebih dahulu!", true);
-        return;
-      }
-
       try {
-        localStorage.setItem('GEMINI_KEY', apiKeyVal);
-        localStorage.setItem('SB_URL', sbUrlVal);
-        localStorage.setItem('SB_KEY', sbKeyVal);
-        showNotice("✅ Pengaturan berhasil disimpan ke memori HP!");
+        if(apiKeyVal) localStorage.setItem('GEMINI_KEY', apiKeyVal);
+        if(sbUrlVal) localStorage.setItem('SB_URL', sbUrlVal);
+        if(sbKeyVal) localStorage.setItem('SB_KEY', sbKeyVal);
+        showNotice("✅ Pengaturan kustom berhasil disimpan!");
         loadAuditHistory();
       } catch (err) {
         showNotice("❌ Gagal menyimpan: " + err.message, true);
       }
     }
 
-    // 2. Evaluasi NFT
+    // Dynamic Multi-Model API Caller (Solusi Anti Error Model Not Found)
+    async function callGeminiAPI(apiKey, prompt, fileType, base64Data) {
+      const modelsToTry = [
+        "gemini-2.5-flash",
+        "gemini-1.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-pro"
+      ];
+
+      let lastError = null;
+
+      for (const model of modelsToTry) {
+        try {
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: prompt },
+                  { inline_data: { mime_type: fileType, data: base64Data } }
+                ]
+              }]
+            })
+          });
+
+          const data = await res.json();
+          if (res.ok && data.candidates && data.candidates[0].content.parts[0].text) {
+            return data.candidates[0].content.parts[0].text;
+          } else {
+            lastError = data.error?.message || `Model ${model} gagal dipanggil`;
+          }
+        } catch (e) {
+          lastError = e.message;
+        }
+      }
+
+      throw new Error(lastError || "Semua model Gemini gagal diakses.");
+    }
+
     async function processNFT() {
       const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('GEMINI_KEY');
       const fileInput = document.getElementById('imageInput');
@@ -202,7 +237,7 @@
       const btn = document.getElementById('btnSubmit');
 
       if (!apiKey) {
-        showNotice("⚠️ Gemini API Key belum diisi! Masukkan Key di kotak atas lalu klik Simpan.", true);
+        showNotice("⚠️ Gemini API Key belum diisi!", true);
         return;
       }
 
@@ -221,8 +256,9 @@
 
       try {
         const file = fileInput.files[0];
-        const base64Data = await toBase64(file);
-        
+        const base64Full = await toBase64(file);
+        const base64Data = base64Full.split(',')[1];
+
         const img = new Image();
         img.src = URL.createObjectURL(file);
         await new Promise((resolve) => { img.onload = resolve; });
@@ -249,7 +285,7 @@ Evaluasi gambar dan deskripsi ini berdasarkan aturan ketat berikut:
 
 Deskripsi Pengguna: "${lore}"
 
-Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
+Kembalikan HANYA format JSON valid tanpa format markdown:
 {
   "keputusan": "APPROVE atau REJECT",
   "kesesuaian_lore_persen": 90,
@@ -265,27 +301,7 @@ Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
   "keterangan": "Penjelasan singkat alasan approve/reject"
 }`;
 
-        // Calling Gemini API
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{
-              parts: [
-                { text: prompt },
-                { inline_data: { mime_type: file.type, data: base64Data.split(',')[1] } }
-              ]
-            }]
-          })
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.error?.message || "Gagal merespons dari Gemini API. Periksa kembali API Key Anda.");
-        }
-
-        let textResult = data.candidates[0].content.parts[0].text;
+        let textResult = await callGeminiAPI(apiKey, prompt, file.type, base64Data);
         textResult = textResult.replace(/```json/gi, '').replace(/```/gi, '').trim();
         
         const resultJson = JSON.parse(textResult);
@@ -306,7 +322,6 @@ Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
         };
 
         renderResult(resultJson, currentAuditData.resolusi);
-
         saveToSupabase(currentAuditData);
         setTimeout(loadAuditHistory, 1500);
 
@@ -319,10 +334,9 @@ Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
       }
     }
 
-    // Helper: Supabase Upload
     async function uploadImageToSupabase(file) {
-      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL');
-      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY');
+      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
+      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
 
       if (!sbUrl || !sbKey || typeof window.supabase === 'undefined') return null;
 
@@ -346,15 +360,14 @@ Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
       }
     }
 
-    // Helper: Supabase Save
     async function saveToSupabase(audit) {
-      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL');
-      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY');
+      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
+      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
       const dbStatus = document.getElementById('dbStatus');
 
       if (!sbUrl || !sbKey || typeof window.supabase === 'undefined') {
         dbStatus.className = "text-[11px] text-center italic py-1 text-slate-400";
-        dbStatus.innerText = "ℹ️ Hasil audit ditampilkan (Supabase tidak terhubung).";
+        dbStatus.innerText = "ℹ️ Hasil audit ditampilkan (Supabase belum disetting).";
         return;
       }
 
@@ -379,18 +392,17 @@ Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
         dbStatus.innerText = "✅ Tersimpan ke Supabase Database & Storage!";
       } catch (err) {
         dbStatus.className = "text-[11px] text-center italic py-1 text-rose-400";
-        dbStatus.innerText = "⚠️ Log DB: " + err.message;
+        dbStatus.innerText = "⚠️ DB Status: " + err.message;
       }
     }
 
-    // Helper: Muat Riwayat
     async function loadAuditHistory() {
-      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL');
-      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY');
+      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
+      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
       const tbody = document.getElementById('historyTableBody');
 
       if (!sbUrl || !sbKey || typeof window.supabase === 'undefined') {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400 italic">Isi URL & Key Supabase untuk sinkronisasi riwayat.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400 italic">Isi Key Supabase untuk sinkronisasi riwayat.</td></tr>`;
         return;
       }
 
@@ -432,7 +444,7 @@ Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
         });
 
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Gagal memuat riwayat: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Riwayat DB: ${err.message}</td></tr>`;
       }
     }
 
@@ -485,7 +497,7 @@ Kembalikan HANYA format JSON valid tanpa format markdown tambahan:
       navigator.clipboard.writeText(reportText).then(() => {
         alert("Laporan audit berhasil disalin!");
       }).catch(() => {
-        alert("Gagal menyalin otomatis. Silakan salin manual.");
+        alert("Gagal menyalin otomatis.");
       });
     }
 
