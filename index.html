@@ -3,513 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFT Validator DAO - Nusantara AI</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>NFT DAO Validator</title>
+  <style>
+    /* Menyembunyikan form Pengaturan API & Supabase */
+    #settings-panel {
+      display: none !important;
+    }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-4 font-sans">
-  <div class="max-w-xl mx-auto space-y-6">
-    
-    <!-- Header -->
-    <header class="text-center py-2 border-b border-slate-700">
-      <h1 class="text-xl font-bold text-purple-400">NFT DAO Validator</h1>
-      <p class="text-xs text-slate-400">Standar 4K, Security Filter, Min Skor 80 & Storage Auto-Sync</p>
-    </header>
+<body>
 
-    <!-- Form Input Config & Data -->
-    <div class="bg-slate-800 p-4 rounded-xl space-y-4 border border-slate-700">
-      
-      <!-- Pengaturan API & Supabase -->
-      <div class="bg-slate-900 p-3 rounded-lg border border-purple-500/30 space-y-2">
-        <h2 class="text-xs text-purple-400 font-bold flex items-center justify-between">
-          <span>⚙️ Pengaturan API & Supabase</span>
-          <span class="text-[10px] text-slate-500 font-normal">(Opsional)</span>
-        </h2>
-        
-        <div>
-          <label class="block text-[10px] text-slate-400 mb-0.5">Gemini API Key:</label>
-          <input type="password" id="apiKey" placeholder="Kosongkan jika menggunakan sistem default" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500">
-        </div>
-        
-        <div>
-          <label class="block text-[10px] text-slate-400 mb-0.5">Supabase URL:</label>
-          <input type="text" id="sbUrl" placeholder="https://xxx.supabase.co" class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500">
-        </div>
-        
-        <div>
-          <label class="block text-[10px] text-slate-400 mb-0.5">Supabase Anon Key:</label>
-          <input type="password" id="sbKey" placeholder="eyJhbGci..." class="w-full bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500">
-        </div>
-        
-        <button type="button" id="btnSaveConfig" class="w-full bg-purple-700 hover:bg-purple-600 active:bg-purple-800 text-white font-bold text-xs py-2 rounded transition shadow">
-          💾 Simpan Pengaturan Kustom ke HP
-        </button>
-        <p id="saveNotice" class="text-[11px] text-center font-semibold hidden"></p>
-      </div>
+  <div class="container">
+    <h2>NFT DAO Validator</h2>
+    <p>Standar 4K, Security Filter, Min Skor 80 & Storage Auto-Sync</p>
 
-      <!-- Input Gambar -->
-      <div>
-        <label class="block text-xs font-semibold mb-1 text-slate-300">Unggah Gambar NFT / Screenshot Karya:</label>
-        <input type="file" id="imageInput" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:text-xs file:bg-purple-600 file:text-white hover:file:bg-purple-700">
-      </div>
-
-      <!-- Input Lore -->
-      <div>
-        <label class="block text-xs font-semibold mb-1 text-slate-300">Deskripsi / Lore (Max 130 Karakter):</label>
-        <textarea id="loreInput" maxlength="130" rows="3" placeholder="Tuliskan deskripsi/lore aset..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-xs text-white focus:outline-none focus:border-purple-500"></textarea>
-      </div>
-
-      <!-- Tombol Utama Evaluasi -->
-      <button type="button" id="btnSubmit" class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-bold py-3 rounded-lg text-sm transition shadow-lg">
-        Evaluasi & Kurasi NFT
-      </button>
+    <!-- Form Pengaturan disembunyikan -->
+    <div id="settings-panel">
+      <input type="password" id="gemini-key" placeholder="Gemini API Key">
+      <input type="text" id="supabase-url" placeholder="Supabase URL">
+      <input type="password" id="supabase-key" placeholder="Supabase Anon Key">
     </div>
 
-    <!-- Panel Hasil Evaluasi -->
-    <div id="resultCard" class="hidden bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-      <div id="statusBadge" class="text-center py-2 rounded-lg font-black text-lg tracking-wider"></div>
-      
-      <div class="text-xs space-y-1 bg-slate-900 p-2 rounded border border-slate-700">
-        <p><span class="text-slate-400">Resolusi Terdeteksi:</span> <strong id="resText" class="text-white"></strong></p>
-        <p><span class="text-slate-400">Kesesuaian Lore:</span> <strong id="loreText" class="text-white"></strong></p>
-      </div>
+    <!-- Form Input NFT Utama -->
+    <div class="upload-section">
+      <label>Unggah Gambar NFT / Screenshot Karya:</label>
+      <input type="file" id="nft-file" accept="image/*">
 
-      <div class="text-xs space-y-1">
-        <h3 class="font-bold text-slate-300">Evaluasi Parameter (Min 80):</h3>
-        <div id="scoreList" class="grid grid-cols-2 gap-1 text-[11px]"></div>
-      </div>
+      <label>Deskripsi / Lore (Max 130 Karakter):</label>
+      <textarea id="nft-lore" maxlength="130" placeholder="Tuliskan deskripsi/lore aset..."></textarea>
 
-      <div class="text-xs bg-slate-900 p-2 rounded border border-slate-700">
-        <p class="text-slate-400 font-semibold mb-1">Keterangan Validator:</p>
-        <p id="keteranganText" class="text-slate-200 leading-relaxed"></p>
-      </div>
-
-      <!-- Status Sinkronisasi DB -->
-      <div id="dbStatus" class="text-[11px] text-center italic py-1 rounded"></div>
-
-      <!-- Tombol Ekspor -->
-      <div class="pt-2 border-t border-slate-700 space-y-2">
-        <button type="button" id="btnCopyReport" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded text-xs transition">
-          📋 Salin Laporan Komunitas (WA/Telegram)
-        </button>
-        <button type="button" id="btnDownloadJson" class="w-full bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold py-1.5 rounded text-xs transition">
-          💾 Unduh Berkas JSON Audit
-        </button>
-      </div>
+      <button id="btn-evaluasi" onclick="evaluasiNFT()">Evaluasi & Kurasi NFT</button>
     </div>
 
-    <!-- Log Riwayat Audit DAO -->
-    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-      <div class="flex justify-between items-center border-b border-slate-700 pb-2">
-        <h2 class="text-sm font-bold text-purple-400 flex items-center gap-1">
-          📊 Log Riwayat Audit DAO
-        </h2>
-        <button type="button" id="btnReloadHistory" class="text-[11px] bg-slate-700 hover:bg-slate-600 text-slate-200 px-2.5 py-1 rounded transition">
-          🔄 Muat Ulang
-        </button>
-      </div>
-
-      <div class="overflow-x-auto">
-        <table class="w-full text-[11px] text-left text-slate-300">
-          <thead class="bg-slate-900 text-slate-400 uppercase text-[10px]">
-            <tr>
-              <th class="p-2">Visual</th>
-              <th class="p-2">Status</th>
-              <th class="p-2">Lore</th>
-              <th class="p-2">Resolusi</th>
-              <th class="p-2">Lore %</th>
-            </tr>
-          </thead>
-          <tbody id="historyTableBody" class="divide-y divide-slate-700">
-            <tr>
-              <td colspan="5" class="p-3 text-center text-slate-500 italic" id="historyPlaceholder">
-                Siap memuat data...
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Log Riwayat Audit -->
+    <div class="audit-log">
+      <h3>Log Riwayat Audit DAO</h3>
+      <table id="log-table">
+        <thead>
+          <tr>
+            <th>VISUAL</th>
+            <th>STATUS</th>
+            <th>LORE</th>
+            <th>RESOLUSI</th>
+            <th>LORE %</th>
+          </tr>
+        </thead>
+        <tbody id="log-body">
+          <!-- Data audit akan dimuat di sini -->
+        </tbody>
+      </table>
     </div>
-
   </div>
 
-  <!-- Safe Supabase Async Loading -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script>
-    // ===== MASTER CONFIG (UNTUK KOMUNITAS) =====
-    const DEFAULT_SUPABASE_URL = "https://nvjimdkswoxvlnlapibw.supabase.co"; 
-    const DEFAULT_SUPABASE_KEY = ""; // Salin Anon Key Supabase Anda di sini
-    // ============================================
-
-    let currentAuditData = null;
-
-    function showNotice(text, isError = false) {
-      const el = document.getElementById('saveNotice');
-      el.innerText = text;
-      el.className = isError 
-        ? "text-[11px] text-center font-semibold text-rose-400 block mt-1" 
-        : "text-[11px] text-center font-semibold text-emerald-400 block mt-1";
-      setTimeout(() => { el.classList.add('hidden'); }, 5000);
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      try {
-        const savedKey = localStorage.getItem('GEMINI_KEY') || '';
-        const savedUrl = localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
-        const savedSbKey = localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
-
-        if (savedKey) document.getElementById('apiKey').value = savedKey;
-        document.getElementById('sbUrl').value = savedUrl;
-        if (savedSbKey) document.getElementById('sbKey').value = savedSbKey;
-      } catch (e) {
-        console.warn("Storage warning:", e);
-      }
-
-      document.getElementById('btnSaveConfig').onclick = saveKeys;
-      document.getElementById('btnSubmit').onclick = processNFT;
-      document.getElementById('btnReloadHistory').onclick = loadAuditHistory;
-      document.getElementById('btnCopyReport').onclick = copyAuditText;
-      document.getElementById('btnDownloadJson').onclick = downloadJsonAudit;
-
-      setTimeout(loadAuditHistory, 800);
-    });
-
-    function saveKeys() {
-      const apiKeyVal = document.getElementById('apiKey').value.trim();
-      const sbUrlVal = document.getElementById('sbUrl').value.trim();
-      const sbKeyVal = document.getElementById('sbKey').value.trim();
-
-      try {
-        if(apiKeyVal) localStorage.setItem('GEMINI_KEY', apiKeyVal);
-        if(sbUrlVal) localStorage.setItem('SB_URL', sbUrlVal);
-        if(sbKeyVal) localStorage.setItem('SB_KEY', sbKeyVal);
-        showNotice("✅ Pengaturan kustom berhasil disimpan!");
-        loadAuditHistory();
-      } catch (err) {
-        showNotice("❌ Gagal menyimpan: " + err.message, true);
-      }
-    }
-
-    // Dynamic Multi-Model API Caller (Solusi Anti Error Model Not Found)
-    async function callGeminiAPI(apiKey, prompt, fileType, base64Data) {
-      const modelsToTry = [
-        "gemini-2.5-flash",
-        "gemini-1.5-flash",
-        "gemini-2.0-flash",
-        "gemini-1.5-pro"
-      ];
-
-      let lastError = null;
-
-      for (const model of modelsToTry) {
-        try {
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{
-                parts: [
-                  { text: prompt },
-                  { inline_data: { mime_type: fileType, data: base64Data } }
-                ]
-              }]
-            })
-          });
-
-          const data = await res.json();
-          if (res.ok && data.candidates && data.candidates[0].content.parts[0].text) {
-            return data.candidates[0].content.parts[0].text;
-          } else {
-            lastError = data.error?.message || `Model ${model} gagal dipanggil`;
-          }
-        } catch (e) {
-          lastError = e.message;
-        }
-      }
-
-      throw new Error(lastError || "Semua model Gemini gagal diakses.");
-    }
-
-    async function processNFT() {
-      const apiKey = document.getElementById('apiKey').value.trim() || localStorage.getItem('GEMINI_KEY');
-      const fileInput = document.getElementById('imageInput');
-      const lore = document.getElementById('loreInput').value.trim();
-      const btn = document.getElementById('btnSubmit');
-
-      if (!apiKey) {
-        showNotice("⚠️ Gemini API Key belum diisi!", true);
-        return;
-      }
-
-      if (fileInput.files.length === 0) {
-        alert("⚠️ Mohon pilih file gambar NFT terlebih dahulu!");
-        return;
-      }
-
-      if (!lore) {
-        alert("⚠️ Mohon isikan Deskripsi / Lore karya!");
-        return;
-      }
-
+    // Ambil konfigurasi dari Vercel Endpoint / Serverless API
+    async function evaluasiNFT() {
+      const btn = document.getElementById("btn-evaluasi");
       btn.innerText = "⏳ Menganalisis & Mengunggah Aset...";
       btn.disabled = true;
 
       try {
-        const file = fileInput.files[0];
-        const base64Full = await toBase64(file);
-        const base64Data = base64Full.split(',')[1];
+        // Contoh pemanggilan API backend Vercel yang membaca process.env.GEMINI_API_KEY
+        const response = await fetch('/api/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lore: document.getElementById('nft-lore').value,
+            model: "gemini-1.5-flash" // Penggunaan model Gemini yang stabil & valid
+          })
+        });
 
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        await new Promise((resolve) => { img.onload = resolve; });
-
-        const width = img.width;
-        const height = img.height;
-        const is4K = (width >= 3840 || height >= 3840 || (width >= 2160 && height >= 2160));
-
-        const prompt = `Anda adalah sistem validator NFT DAO otomatis.
-Evaluasi gambar dan deskripsi ini berdasarkan aturan ketat berikut:
-1. SECURITY FILTER: Tolak jika mengandung pornografi, perjudian, narkoba, kekerasan, terorisme, politik, plagiat/screenshot berkualitas rendah, atau gambar buram.
-2. STANDAR KUALITAS: Berikan skor 1-100 untuk parameter:
-   - Pencahayaan & Atmosfer
-   - Detail Karakter
-   - Komposisi & Kedalaman
-   - Daya Tarik Estetika
-   - Orisinalitas Konsep
-   - Penyelesaian Visual
-   - Daya Tahan Tren
-   - Kesesuaian Lore dengan Visual (%)
-3. ATURAN KEPUTUSAN:
-   - "APPROVE" HANYA jika TIDAK MELANGGAR security filter, Kesesuaian Lore >= 80%, DAN SEMUA SKOR PARAMETER >= 80.
-   - Selain itu, keluarkan "REJECT".
-
-Deskripsi Pengguna: "${lore}"
-
-Kembalikan HANYA format JSON valid tanpa format markdown:
-{
-  "keputusan": "APPROVE atau REJECT",
-  "kesesuaian_lore_persen": 90,
-  "skor": {
-    "Pencahayaan": 85,
-    "Detail Karakter": 90,
-    "Komposisi": 88,
-    "Estetika": 92,
-    "Orisinalitas": 80,
-    "Penyelesaian Visual": 89,
-    "Daya Tahan Tren": 85
-  },
-  "keterangan": "Penjelasan singkat alasan approve/reject"
-}`;
-
-        let textResult = await callGeminiAPI(apiKey, prompt, file.type, base64Data);
-        textResult = textResult.replace(/```json/gi, '').replace(/```/gi, '').trim();
+        const data = await response.json();
         
-        const resultJson = JSON.parse(textResult);
-
-        if (!is4K) {
-          resultJson.keputusan = "REJECT";
-          resultJson.keterangan = "[Gagal Resolusi 4K] " + resultJson.keterangan;
+        if (!response.ok) {
+          throw new Error(data.message || "Gagal melakukan evaluasi.");
         }
 
-        const imageUrl = await uploadImageToSupabase(file);
-
-        currentAuditData = {
-          ...resultJson,
-          resolusi: `${width} x ${height} px (${is4K ? '4K UHD' : 'Di Bawah 4K'})`,
-          lore: lore,
-          image_url: imageUrl,
-          tanggal: new Date().toLocaleString('id-ID')
-        };
-
-        renderResult(resultJson, currentAuditData.resolusi);
-        saveToSupabase(currentAuditData);
-        setTimeout(loadAuditHistory, 1500);
-
+        alert("Evaluasi Berhasil!");
       } catch (err) {
-        alert("❌ Error Evaluasi: " + err.message);
-        console.error(err);
+        alert("Error Evaluasi: " + err.message);
       } finally {
         btn.innerText = "Evaluasi & Kurasi NFT";
         btn.disabled = false;
       }
-    }
-
-    async function uploadImageToSupabase(file) {
-      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
-      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
-
-      if (!sbUrl || !sbKey || typeof window.supabase === 'undefined') return null;
-
-      try {
-        const client = window.supabase.createClient(sbUrl, sbKey);
-        const fileName = `nft_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-
-        const { data, error } = await client.storage
-          .from('nft-assets')
-          .upload(fileName, file);
-
-        if (error) return null;
-
-        const { data: publicUrlData } = client.storage
-          .from('nft-assets')
-          .getPublicUrl(fileName);
-
-        return publicUrlData.publicUrl;
-      } catch (err) {
-        return null;
-      }
-    }
-
-    async function saveToSupabase(audit) {
-      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
-      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
-      const dbStatus = document.getElementById('dbStatus');
-
-      if (!sbUrl || !sbKey || typeof window.supabase === 'undefined') {
-        dbStatus.className = "text-[11px] text-center italic py-1 text-slate-400";
-        dbStatus.innerText = "ℹ️ Hasil audit ditampilkan (Supabase belum disetting).";
-        return;
-      }
-
-      try {
-        dbStatus.className = "text-[11px] text-center italic py-1 text-amber-400";
-        dbStatus.innerText = "💾 Menyimpan ke database...";
-
-        const client = window.supabase.createClient(sbUrl, sbKey);
-        const { error } = await client.from('audit_logs').insert([{
-          keputusan: audit.keputusan,
-          resolusi: audit.resolusi,
-          kesesuaian_lore: audit.kesesuaian_lore_persen,
-          lore: audit.lore,
-          skor: audit.skor,
-          keterangan: audit.keterangan,
-          image_url: audit.image_url
-        }]);
-
-        if (error) throw error;
-
-        dbStatus.className = "text-[11px] text-center italic py-1 text-emerald-400";
-        dbStatus.innerText = "✅ Tersimpan ke Supabase Database & Storage!";
-      } catch (err) {
-        dbStatus.className = "text-[11px] text-center italic py-1 text-rose-400";
-        dbStatus.innerText = "⚠️ DB Status: " + err.message;
-      }
-    }
-
-    async function loadAuditHistory() {
-      const sbUrl = document.getElementById('sbUrl').value.trim() || localStorage.getItem('SB_URL') || DEFAULT_SUPABASE_URL;
-      const sbKey = document.getElementById('sbKey').value.trim() || localStorage.getItem('SB_KEY') || DEFAULT_SUPABASE_KEY;
-      const tbody = document.getElementById('historyTableBody');
-
-      if (!sbUrl || !sbKey || typeof window.supabase === 'undefined') {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-400 italic">Isi Key Supabase untuk sinkronisasi riwayat.</td></tr>`;
-        return;
-      }
-
-      try {
-        const client = window.supabase.createClient(sbUrl, sbKey);
-        const { data, error } = await client
-          .from('audit_logs')
-          .select('*')
-          .order('created_at', { ascending: false })
-          .limit(10);
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Belum ada riwayat audit tersimpan.</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = '';
-        data.forEach(item => {
-          const badgeClass = item.keputusan === 'APPROVE' ? 'bg-emerald-900/60 text-emerald-400 border-emerald-700' : 'bg-rose-900/60 text-rose-400 border-rose-700';
-          const imgElem = item.image_url 
-            ? `<a href="${item.image_url}" target="_blank"><img src="${item.image_url}" class="w-8 h-8 object-cover rounded border border-slate-700"></a>`
-            : `<span class="text-slate-600 text-[9px]">No img</span>`;
-
-          tbody.innerHTML += `
-            <tr class="hover:bg-slate-800/50">
-              <td class="p-2">${imgElem}</td>
-              <td class="p-2">
-                <span class="px-1.5 py-0.5 rounded text-[9px] font-bold border ${badgeClass}">
-                  ${item.keputusan}
-                </span>
-              </td>
-              <td class="p-2 text-slate-200 max-w-[110px] truncate" title="${item.lore}">${item.lore}</td>
-              <td class="p-2 text-slate-400 whitespace-nowrap">${item.resolusi}</td>
-              <td class="p-2 text-slate-300 font-semibold">${item.kesesuaian_lore}%</td>
-            </tr>
-          `;
-        });
-
-      } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-3 text-center text-slate-500 italic">Riwayat DB: ${err.message}</td></tr>`;
-      }
-    }
-
-    function toBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-      });
-    }
-
-    function renderResult(data, resStatus) {
-      const card = document.getElementById('resultCard');
-      const badge = document.getElementById('statusBadge');
-      
-      card.classList.remove('hidden');
-
-      if (data.keputusan === 'APPROVE') {
-        badge.className = "text-center py-2 rounded-lg font-black text-lg tracking-wider bg-emerald-600 text-white";
-        badge.innerText = "APPROVE";
-      } else {
-        badge.className = "text-center py-2 rounded-lg font-black text-lg tracking-wider bg-rose-600 text-white";
-        badge.innerText = "REJECT";
-      }
-
-      document.getElementById('resText').innerText = resStatus;
-      document.getElementById('loreText').innerText = data.kesesuaian_lore_persen + "%";
-      document.getElementById('keteranganText').innerText = data.keterangan;
-
-      const scoreList = document.getElementById('scoreList');
-      scoreList.innerHTML = '';
-      for (const [key, val] of Object.entries(data.skor)) {
-        const color = val >= 80 ? 'text-emerald-400' : 'text-rose-400';
-        scoreList.innerHTML += `<div class="bg-slate-900 p-1.5 rounded border border-slate-700 flex justify-between"><span>${key}</span><strong class="${color}">${val}</strong></div>`;
-      }
-
-      card.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function copyAuditText() {
-      if (!currentAuditData) return;
-      const statusEmoji = currentAuditData.keputusan === 'APPROVE' ? '🟢 [APPROVED]' : '🔴 [REJECTED]';
-      let skorFormatted = '';
-      for (const [key, val] of Object.entries(currentAuditData.skor)) {
-        skorFormatted += `• ${key}: ${val}/100\n`;
-      }
-      const reportText = `📢 *LAPORAN AUDIT KURASI NFT DAO*\n──────────────────────\nStatus: *${statusEmoji}*\nWaktu Audit: ${currentAuditData.tanggal}\n\n📝 *Deskripsi / Lore:*\n"${currentAuditData.lore}"\n\n📊 *Detail Kriteria:*\n• Resolusi: ${currentAuditData.resolusi}\n• Kesesuaian Lore: ${currentAuditData.kesesuaian_lore_persen}%\n• Link Gambar: ${currentAuditData.image_url || 'N/A'}\n\n⭐ *Rincian Skor Parameter (Min 80):*\n${skorFormatted}\n💡 *Keterangan Validator:*\n${currentAuditData.keterangan}\n──────────────────────\n_Di-audit otomatis oleh NFT Validator DAO Engine_`;
-
-      navigator.clipboard.writeText(reportText).then(() => {
-        alert("Laporan audit berhasil disalin!");
-      }).catch(() => {
-        alert("Gagal menyalin otomatis.");
-      });
-    }
-
-    function downloadJsonAudit() {
-      if (!currentAuditData) return;
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentAuditData, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `Audit_NFT_${Date.now()}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
     }
   </script>
 </body>
