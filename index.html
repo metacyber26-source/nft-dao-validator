@@ -3,54 +3,196 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFT DAO Validator</title>
+  <title>Nusantara AI - NFT DAO Validator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     #settings-panel { display: none !important; }
-    body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
-    .container { max-width: 800px; margin: auto; background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-    h2 { margin-top: 0; color: #a855f7; }
-    .upload-area { border: 2px dashed #a855f7; border-radius: 8px; padding: 25px; text-align: center; background: #0f172a; margin-bottom: 20px; cursor: pointer; }
-    .upload-area input { display: none; }
-    .btn-submit { width: 100%; padding: 14px; background: #9333ea; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
-    .btn-submit:hover { background: #7e22ce; }
-    .btn-submit:disabled { background: #475569; cursor: not-allowed; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0f172a; border-radius: 8px; overflow: hidden; }
-    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; font-size: 14px; }
-    th { background: #334155; color: #cbd5e1; }
-    .status-approved { color: #4ade80; font-weight: bold; }
-    .status-rejected { color: #f87171; font-weight: bold; }
+
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% -20%, #1e1b4b, #0f172a, #020617);
+      --neon-purple: #c084fc;
+      --neon-cyan: #22d3ee;
+      --neon-pink: #f43f5e;
+      --glass-bg: rgba(15, 23, 42, 0.65);
+      --glass-border: rgba(192, 132, 252, 0.2);
+    }
+
+    * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
+    
+    body {
+      background: var(--bg-gradient);
+      color: #f8fafc;
+      min-height: 100vh;
+      margin: 0;
+      padding: 30px 15px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .metaverse-card {
+      width: 100%;
+      max-width: 900px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 0 30px rgba(192, 132, 252, 0.15), inset 0 0 15px rgba(255, 255, 255, 0.05);
+    }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #a855f7, #38bdf8, #f43f5e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-transform: uppercase;
+      margin: 0 0 10px 0;
+    }
+
+    .header p { color: #94a3b8; font-size: 15px; letter-spacing: 1px; }
+
+    /* Upload Area Cyberpunk */
+    .drop-zone {
+      border: 2px dashed rgba(56, 189, 248, 0.4);
+      border-radius: 14px;
+      padding: 35px 20px;
+      text-align: center;
+      background: rgba(2, 6, 23, 0.5);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drop-zone:hover {
+      border-color: var(--neon-cyan);
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    .drop-zone input { display: none; }
+    .upload-icon { font-size: 40px; margin-bottom: 10px; display: block; filter: drop-shadow(0 0 8px var(--neon-cyan)); }
+    
+    /* Tombol Eksekusi Metaverse */
+    .btn-cyber {
+      width: 100%;
+      margin-top: 25px;
+      padding: 16px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #fff;
+      background: linear-gradient(90deg, #9333ea, #2563eb);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(147, 51, 234, 0.4);
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+    }
+
+    .btn-cyber:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.6);
+      background: linear-gradient(90deg, #7e22ce, #1d4ed8);
+    }
+
+    .btn-cyber:disabled {
+      background: #334155;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Table Glassmorphism */
+    .table-container { margin-top: 35px; overflow-x: auto; }
+    .table-title { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--neon-cyan); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      color: #cbd5e1;
+      padding: 14px;
+      background: rgba(30, 41, 59, 0.8);
+      border-bottom: 2px solid var(--glass-border);
+      text-transform: uppercase;
+    }
+
+    td { padding: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 15px; }
+
+    .badge-approved {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .badge-rejected {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>NFT DAO Validator</h2>
-    <p>Standar 4K, Security Filter, Min Skor 80 & Storage Auto-Sync</p>
+  <div class="metaverse-card">
+    <div class="header">
+      <h1>Nusantara DAO AI Validator</h1>
+      <p>4K SECURITY FILTER • MULTIMODAL AUTO-DETECTION • SUPABASE SYNC</p>
+    </div>
 
-    <!-- Slot Upload Multi-File (1 Input untuk 2 SS sekaligus) -->
-    <div class="upload-area" onclick="document.getElementById('ss-files').click()">
-      <p id="upload-label">📸 <b>Klik atau Drag 2 Screenshot Sekaligus</b><br><small>(SS Deskripsi PiBox & SS Visual Approve/Reject)</small></p>
+    <!-- Drop Zone Screenshot -->
+    <div class="drop-zone" onclick="document.getElementById('ss-files').click()">
+      <span class="upload-icon">💎</span>
+      <p id="upload-label" style="margin: 0; font-size: 16px; font-weight: 600;">
+        UNGGAH SCREENSHOT DETAIL & VISUAL
+      </p>
+      <small style="color: #64748b; margin-top: 5px; display: block;">
+        Pilih atau Drop 2 Screenshot sekaligus (Deskripsi & Modal Approve/Reject)
+      </small>
       <input type="file" id="ss-files" accept="image/*" multiple onchange="updateFileLabel()">
     </div>
 
-    <button id="btn-evaluasi" class="btn-submit" onclick="prosesEvaluasi()">Evaluasi & Kurasi NFT</button>
+    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">
+      EVALUASI & KURASI NFT
+    </button>
 
-    <!-- Log Riwayat Audit DAO -->
-    <div style="margin-top: 30px;">
-      <h3>📊 Log Riwayat Audit DAO</h3>
+    <!-- Audit Log -->
+    <div class="table-container">
+      <div class="table-title">⚡ LOG AUDIT ON-CHAIN REALTIME</div>
       <table>
         <thead>
           <tr>
-            <th>TITLE / ISSUER</th>
-            <th>STATUS</th>
-            <th>HARGA</th>
-            <th>SKOR VISUAL</th>
-            <th>SKOR LORE</th>
+            <th>NFT Title & Issuer</th>
+            <th>Status</th>
+            <th>Harga</th>
+            <th>Visual Skor</th>
+            <th>Lore %</th>
           </tr>
         </thead>
         <tbody id="log-body">
           <tr>
-            <td colspan="5" style="text-align:center; color:#94a3b8;">Belum ada riwayat audit.</td>
+            <td colspan="5" style="text-align:center; color:#64748b; padding: 25px;">
+              Belum ada riwayat audit terkini.
+            </td>
           </tr>
         </tbody>
       </table>
@@ -62,7 +204,7 @@
       const files = document.getElementById("ss-files").files;
       const label = document.getElementById("upload-label");
       if (files.length > 0) {
-        label.innerHTML = `✅ <b>${files.length} Screenshot Dipilih</b>`;
+        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} FILE SCREENSHOT TERPILIH</span>`;
       }
     }
 
@@ -80,11 +222,11 @@
       const btn = document.getElementById("btn-evaluasi");
 
       if (files.length < 1) {
-        alert("Harap pilih minimal 1 atau 2 screenshot terlebih dahulu!");
+        alert("Silakan pilih minimal 1 atau 2 screenshot NFT terlebih dahulu!");
         return;
       }
 
-      btn.innerText = "⏳ Memproses Auto-Detection AI...";
+      btn.innerText = "🌀 MEMPROSES NEURAL AUDIT...";
       btn.disabled = true;
 
       try {
@@ -103,30 +245,30 @@
         const result = await response.json();
         if (!response.ok) throw new Error(result.message);
 
-        // Parsing hasil JSON dari Gemini API
         const data = JSON.parse(result.data.replace(/```json|```/g, '').trim());
 
-        // Tambah ke tabel log
         const logBody = document.getElementById("log-body");
         if (logBody.children[0].children.length === 1) logBody.innerHTML = "";
 
-        const statusClass = data.status === "APPROVED" ? "status-approved" : "status-rejected";
+        const statusBadge = data.status === "APPROVED" 
+          ? `<span class="badge-approved">APPROVED</span>` 
+          : `<span class="badge-rejected">REJECTED</span>`;
+
         const row = `
           <tr>
-            <td><b>${data.title || '-'}</b><br><small>${data.issuer || '-'}</small></td>
-            <td class="${statusClass}">${data.status}</td>
-            <td>${data.price || '-'}</td>
+            <td><b>${data.title || 'Untitled'}</b><br><small style="color:#94a3b8">${data.issuer || '-'}</small></td>
+            <td>${statusBadge}</td>
+            <td style="color: var(--neon-cyan); font-weight:700;">${data.price || '0'} Pi</td>
             <td>${data.visualScore}%</td>
             <td>${data.loreScore}%</td>
           </tr>
         `;
         logBody.innerHTML = row + logBody.innerHTML;
 
-        alert(`Evaluasi Selesai! Status: ${data.status}`);
       } catch (err) {
-        alert("Error: " + err.message);
+        alert("Gagal Evaluasi: " + err.message);
       } finally {
-        btn.innerText = "Evaluasi & Kurasi NFT";
+        btn.innerText = "EVALUASI & KURASI NFT";
         btn.disabled = false;
       }
     }
