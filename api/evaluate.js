@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
-  // Tetapkan Header JSON
   res.setHeader('Content-Type', 'application/json');
 
   if (req.method !== 'POST') {
@@ -54,8 +53,6 @@ export default async function handler(req, res) {
 
     const result = await model.generateContent(contentParts);
     let responseText = await result.response.text();
-
-    // Clean JSON response dari markdown ```json ... ```
     responseText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
 
     return res.status(200).json({ 
