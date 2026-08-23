@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NFT DAO Validator</title>
   <style>
-    /* Menyembunyikan form Pengaturan API & Supabase */
-    #settings-panel {
-      display: none !important;
-    }
+    #settings-panel { display: none !important; }
+    .upload-box { margin: 20px 0; padding: 15px; border: 1px dashed #4a5568; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -17,75 +15,68 @@
     <h2>NFT DAO Validator</h2>
     <p>Standar 4K, Security Filter, Min Skor 80 & Storage Auto-Sync</p>
 
-    <!-- Form Pengaturan disembunyikan -->
-    <div id="settings-panel">
-      <input type="password" id="gemini-key" placeholder="Gemini API Key">
-      <input type="text" id="supabase-url" placeholder="Supabase URL">
-      <input type="password" id="supabase-key" placeholder="Supabase Anon Key">
+    <div class="upload-box">
+      <label><b>Unggah Screenshot Detail NFT (PiBox / On-chain Review):</b></label><br><br>
+      <input type="file" id="nft-ss" accept="image/*">
     </div>
 
-    <!-- Form Input NFT Utama -->
-    <div class="upload-section">
-      <label>Unggah Gambar NFT / Screenshot Karya:</label>
-      <input type="file" id="nft-file" accept="image/*">
+    <button id="btn-evaluasi" onclick="evaluasiNFT()">Evaluasi & Kurasi NFT</button>
 
-      <label>Deskripsi / Lore (Max 130 Karakter):</label>
-      <textarea id="nft-lore" maxlength="130" placeholder="Tuliskan deskripsi/lore aset..."></textarea>
-
-      <button id="btn-evaluasi" onclick="evaluasiNFT()">Evaluasi & Kurasi NFT</button>
-    </div>
-
-    <!-- Log Riwayat Audit -->
-    <div class="audit-log">
+    <div class="audit-log" style="margin-top: 20px;">
       <h3>Log Riwayat Audit DAO</h3>
-      <table id="log-table">
+      <table id="log-table" border="1" width="100%">
         <thead>
           <tr>
-            <th>VISUAL</th>
+            <th>TITLE & ISSUER</th>
             <th>STATUS</th>
-            <th>LORE</th>
-            <th>RESOLUSI</th>
+            <th>LORE / DESKRIPSI</th>
+            <th>VISUAL SKOR</th>
             <th>LORE %</th>
           </tr>
         </thead>
-        <tbody id="log-body">
-          <!-- Data audit akan dimuat di sini -->
-        </tbody>
+        <tbody id="log-body"></tbody>
       </table>
     </div>
   </div>
 
   <script>
-    // Ambil konfigurasi dari Vercel Endpoint / Serverless API
     async function evaluasiNFT() {
+      const fileInput = document.getElementById("nft-ss");
       const btn = document.getElementById("btn-evaluasi");
-      btn.innerText = "⏳ Menganalisis & Mengunggah Aset...";
+
+      if (!fileInput.files[0]) {
+        alert("Silakan pilih file screenshot NFT terlebih dahulu!");
+        return;
+      }
+
+      btn.innerText = "⏳ Membaca SS & Menganalisis Aset...";
       btn.disabled = true;
 
-      try {
-        // Contoh pemanggilan API backend Vercel yang membaca process.env.GEMINI_API_KEY
-        const response = await fetch('/api/evaluate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            lore: document.getElementById('nft-lore').value,
-            model: "gemini-1.5-flash" // Penggunaan model Gemini yang stabil & valid
-          })
-        });
+      // Konversi gambar ke Base64
+      const reader = new FileReader();
+      reader.readAsDataURL(fileInput.files[0]);
+      reader.onload = async function () {
+        const base64Image = reader.result.split(',')[1];
 
-        const data = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(data.message || "Gagal melakukan evaluasi.");
+        try {
+          const response = await fetch('/api/evaluate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageBase64: base64Image })
+          });
+
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.message || "Gagal evaluasi.");
+
+          alert("Evaluasi Berhasil!");
+          console.log("Hasil Audit:", data.data);
+        } catch (err) {
+          alert("Error: " + err.message);
+        } finally {
+          btn.innerText = "Evaluasi & Kurasi NFT";
+          btn.disabled = false;
         }
-
-        alert("Evaluasi Berhasil!");
-      } catch (err) {
-        alert("Error Evaluasi: " + err.message);
-      } finally {
-        btn.innerText = "Evaluasi & Kurasi NFT";
-        btn.disabled = false;
-      }
+      };
     }
   </script>
 </body>
