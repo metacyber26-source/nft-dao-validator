@@ -13,8 +13,8 @@
       --neon-purple: #c084fc;
       --neon-cyan: #22d3ee;
       --neon-pink: #f43f5e;
-      --glass-bg: rgba(15, 23, 42, 0.65);
-      --glass-border: rgba(192, 132, 252, 0.2);
+      --glass-bg: rgba(15, 23, 42, 0.7);
+      --glass-border: rgba(192, 132, 252, 0.25);
     }
 
     * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
@@ -34,36 +34,36 @@
       width: 100%;
       max-width: 900px;
       background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
-      border-radius: 20px;
+      border-radius: 24px;
       padding: 35px;
-      box-shadow: 0 0 30px rgba(192, 132, 252, 0.15), inset 0 0 15px rgba(255, 255, 255, 0.05);
+      box-shadow: 0 0 40px rgba(192, 132, 252, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.05);
     }
 
-    .header { text-align: center; margin-bottom: 30px; }
+    .header { text-align: center; margin-bottom: 25px; }
     .header h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 900;
       letter-spacing: 2px;
       background: linear-gradient(135deg, #a855f7, #38bdf8, #f43f5e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-transform: uppercase;
-      margin: 0 0 10px 0;
+      margin: 0 0 8px 0;
     }
 
-    .header p { color: #94a3b8; font-size: 15px; letter-spacing: 1px; }
+    .header p { color: #94a3b8; font-size: 13px; letter-spacing: 1.5px; }
 
-    /* Upload Area Cyberpunk */
+    /* Upload & Preview Zone */
     .drop-zone {
       border: 2px dashed rgba(56, 189, 248, 0.4);
-      border-radius: 14px;
-      padding: 35px 20px;
+      border-radius: 16px;
+      padding: 25px 20px;
       text-align: center;
-      background: rgba(2, 6, 23, 0.5);
+      background: rgba(2, 6, 23, 0.6);
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
@@ -72,35 +72,61 @@
 
     .drop-zone:hover {
       border-color: var(--neon-cyan);
-      box-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
-      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 0 25px rgba(34, 211, 238, 0.3);
+      background: rgba(15, 23, 42, 0.85);
     }
 
     .drop-zone input { display: none; }
-    .upload-icon { font-size: 40px; margin-bottom: 10px; display: block; filter: drop-shadow(0 0 8px var(--neon-cyan)); }
+    .upload-icon { font-size: 36px; margin-bottom: 8px; display: block; filter: drop-shadow(0 0 10px var(--neon-cyan)); }
     
+    /* Container Pratinjau Gambar */
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+
+    .preview-item {
+      width: 85px;
+      height: 85px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 2px solid var(--neon-cyan);
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+      position: relative;
+      background: #000;
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
     /* Tombol Eksekusi Metaverse */
     .btn-cyber {
       width: 100%;
       margin-top: 25px;
       padding: 16px;
       font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       letter-spacing: 1.5px;
       color: #fff;
       background: linear-gradient(90deg, #9333ea, #2563eb);
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(147, 51, 234, 0.4);
+      box-shadow: 0 0 25px rgba(147, 51, 234, 0.5);
       transition: all 0.3s ease;
       text-transform: uppercase;
     }
 
     .btn-cyber:hover {
       transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(56, 189, 248, 0.6);
+      box-shadow: 0 0 35px rgba(56, 189, 248, 0.7);
       background: linear-gradient(90deg, #7e22ce, #1d4ed8);
     }
 
@@ -112,21 +138,21 @@
     }
 
     /* Table Glassmorphism */
-    .table-container { margin-top: 35px; overflow-x: auto; }
-    .table-title { font-family: 'Orbitron', sans-serif; font-size: 16px; color: var(--neon-cyan); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+    .table-container { margin-top: 30px; overflow-x: auto; }
+    .table-title { font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--neon-cyan); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th {
       font-family: 'Orbitron', sans-serif;
-      font-size: 12px;
+      font-size: 11px;
       color: #cbd5e1;
-      padding: 14px;
-      background: rgba(30, 41, 59, 0.8);
+      padding: 12px;
+      background: rgba(30, 41, 59, 0.85);
       border-bottom: 2px solid var(--glass-border);
       text-transform: uppercase;
     }
 
-    td { padding: 14px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 15px; }
+    td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 14px; }
 
     .badge-approved {
       background: rgba(34, 197, 94, 0.15);
@@ -135,7 +161,7 @@
       padding: 4px 10px;
       border-radius: 20px;
       font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
     }
 
@@ -146,7 +172,7 @@
       padding: 4px 10px;
       border-radius: 20px;
       font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
     }
   </style>
@@ -156,19 +182,23 @@
   <div class="metaverse-card">
     <div class="header">
       <h1>Nusantara DAO AI Validator</h1>
-      <p>4K SECURITY FILTER • MULTIMODAL AUTO-DETECTION • SUPABASE SYNC</p>
+      <p>GEMINI 3.6 FLASH • MULTIMODAL AUTO-DETECTION • SUPABASE SYNC</p>
     </div>
 
-    <!-- Drop Zone Screenshot -->
+    <!-- Drop Zone & Preview SS -->
     <div class="drop-zone" onclick="document.getElementById('ss-files').click()">
       <span class="upload-icon">💎</span>
-      <p id="upload-label" style="margin: 0; font-size: 16px; font-weight: 600;">
+      <p id="upload-label" style="margin: 0; font-size: 15px; font-weight: 600;">
         UNGGAH SCREENSHOT DETAIL & VISUAL
       </p>
-      <small style="color: #64748b; margin-top: 5px; display: block;">
-        Pilih atau Drop 2 Screenshot sekaligus (Deskripsi & Modal Approve/Reject)
+      <small style="color: #64748b; margin-top: 4px; display: block;">
+        Pilih atau Drop screenshot NFT Anda di sini
       </small>
-      <input type="file" id="ss-files" accept="image/*" multiple onchange="updateFileLabel()">
+      
+      <!-- Tempat Tampil Pratinjau Gambar -->
+      <div id="preview-box" class="preview-container"></div>
+
+      <input type="file" id="ss-files" accept="image/*" multiple onchange="handleFilePreview()">
     </div>
 
     <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">
@@ -184,8 +214,8 @@
             <th>NFT Title & Issuer</th>
             <th>Status</th>
             <th>Harga</th>
-            <th>Visual Skor</th>
-            <th>Lore %</th>
+            <th>Visual</th>
+            <th>Lore</th>
           </tr>
         </thead>
         <tbody id="log-body">
@@ -200,11 +230,28 @@
   </div>
 
   <script>
-    function updateFileLabel() {
+    function handleFilePreview() {
       const files = document.getElementById("ss-files").files;
       const label = document.getElementById("upload-label");
+      const previewBox = document.getElementById("preview-box");
+      
+      previewBox.innerHTML = ""; // Bersihkan preview lama
+
       if (files.length > 0) {
         label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} FILE SCREENSHOT TERPILIH</span>`;
+        
+        for (let i = 0; i < files.length; i++) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const div = document.createElement("div");
+            div.className = "preview-item";
+            div.innerHTML = `<img src="${e.target.result}" alt="Preview SS">`;
+            previewBox.appendChild(div);
+          }
+          reader.readAsDataURL(files[i]);
+        }
+      } else {
+        label.innerText = "UNGGAH SCREENSHOT DETAIL & VISUAL";
       }
     }
 
@@ -222,7 +269,7 @@
       const btn = document.getElementById("btn-evaluasi");
 
       if (files.length < 1) {
-        alert("Silakan pilih minimal 1 atau 2 screenshot NFT terlebih dahulu!");
+        alert("Silakan pilih minimal 1 screenshot NFT terlebih dahulu!");
         return;
       }
 
@@ -258,7 +305,7 @@
           <tr>
             <td><b>${data.title || 'Untitled'}</b><br><small style="color:#94a3b8">${data.issuer || '-'}</small></td>
             <td>${statusBadge}</td>
-            <td style="color: var(--neon-cyan); font-weight:700;">${data.price || '0'} Pi</td>
+            <td style="color: var(--neon-cyan); font-weight:700;">${data.price || '0'}</td>
             <td>${data.visualScore}%</td>
             <td>${data.loreScore}%</td>
           </tr>
