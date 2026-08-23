@@ -6,7 +6,19 @@
   <title>NFT DAO Validator</title>
   <style>
     #settings-panel { display: none !important; }
-    .upload-box { margin: 20px 0; padding: 15px; border: 1px dashed #4a5568; border-radius: 8px; }
+    body { font-family: Arial, sans-serif; background: #0f172a; color: #fff; margin: 0; padding: 20px; }
+    .container { max-width: 800px; margin: auto; background: #1e293b; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    h2 { margin-top: 0; color: #a855f7; }
+    .upload-area { border: 2px dashed #a855f7; border-radius: 8px; padding: 25px; text-align: center; background: #0f172a; margin-bottom: 20px; cursor: pointer; }
+    .upload-area input { display: none; }
+    .btn-submit { width: 100%; padding: 14px; background: #9333ea; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; }
+    .btn-submit:hover { background: #7e22ce; }
+    .btn-submit:disabled { background: #475569; cursor: not-allowed; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0f172a; border-radius: 8px; overflow: hidden; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #334155; font-size: 14px; }
+    th { background: #334155; color: #cbd5e1; }
+    .status-approved { color: #4ade80; font-weight: bold; }
+    .status-rejected { color: #f87171; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -15,68 +27,108 @@
     <h2>NFT DAO Validator</h2>
     <p>Standar 4K, Security Filter, Min Skor 80 & Storage Auto-Sync</p>
 
-    <div class="upload-box">
-      <label><b>Unggah Screenshot Detail NFT (PiBox / On-chain Review):</b></label><br><br>
-      <input type="file" id="nft-ss" accept="image/*">
+    <!-- Slot Upload Multi-File (1 Input untuk 2 SS sekaligus) -->
+    <div class="upload-area" onclick="document.getElementById('ss-files').click()">
+      <p id="upload-label">📸 <b>Klik atau Drag 2 Screenshot Sekaligus</b><br><small>(SS Deskripsi PiBox & SS Visual Approve/Reject)</small></p>
+      <input type="file" id="ss-files" accept="image/*" multiple onchange="updateFileLabel()">
     </div>
 
-    <button id="btn-evaluasi" onclick="evaluasiNFT()">Evaluasi & Kurasi NFT</button>
+    <button id="btn-evaluasi" class="btn-submit" onclick="prosesEvaluasi()">Evaluasi & Kurasi NFT</button>
 
-    <div class="audit-log" style="margin-top: 20px;">
-      <h3>Log Riwayat Audit DAO</h3>
-      <table id="log-table" border="1" width="100%">
+    <!-- Log Riwayat Audit DAO -->
+    <div style="margin-top: 30px;">
+      <h3>📊 Log Riwayat Audit DAO</h3>
+      <table>
         <thead>
           <tr>
-            <th>TITLE & ISSUER</th>
+            <th>TITLE / ISSUER</th>
             <th>STATUS</th>
-            <th>LORE / DESKRIPSI</th>
-            <th>VISUAL SKOR</th>
-            <th>LORE %</th>
+            <th>HARGA</th>
+            <th>SKOR VISUAL</th>
+            <th>SKOR LORE</th>
           </tr>
         </thead>
-        <tbody id="log-body"></tbody>
+        <tbody id="log-body">
+          <tr>
+            <td colspan="5" style="text-align:center; color:#94a3b8;">Belum ada riwayat audit.</td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
 
   <script>
-    async function evaluasiNFT() {
-      const fileInput = document.getElementById("nft-ss");
+    function updateFileLabel() {
+      const files = document.getElementById("ss-files").files;
+      const label = document.getElementById("upload-label");
+      if (files.length > 0) {
+        label.innerHTML = `✅ <b>${files.length} Screenshot Dipilih</b>`;
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    async function prosesEvaluasi() {
+      const files = document.getElementById("ss-files").files;
       const btn = document.getElementById("btn-evaluasi");
 
-      if (!fileInput.files[0]) {
-        alert("Silakan pilih file screenshot NFT terlebih dahulu!");
+      if (files.length < 1) {
+        alert("Harap pilih minimal 1 atau 2 screenshot terlebih dahulu!");
         return;
       }
 
-      btn.innerText = "⏳ Membaca SS & Menganalisis Aset...";
+      btn.innerText = "⏳ Memproses Auto-Detection AI...";
       btn.disabled = true;
 
-      // Konversi gambar ke Base64
-      const reader = new FileReader();
-      reader.readAsDataURL(fileInput.files[0]);
-      reader.onload = async function () {
-        const base64Image = reader.result.split(',')[1];
-
-        try {
-          const response = await fetch('/api/evaluate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ imageBase64: base64Image })
-          });
-
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.message || "Gagal evaluasi.");
-
-          alert("Evaluasi Berhasil!");
-          console.log("Hasil Audit:", data.data);
-        } catch (err) {
-          alert("Error: " + err.message);
-        } finally {
-          btn.innerText = "Evaluasi & Kurasi NFT";
-          btn.disabled = false;
+      try {
+        const imagePayloads = [];
+        for (let i = 0; i < files.length; i++) {
+          const base64 = await fileToBase64(files[i]);
+          imagePayloads.push(base64);
         }
-      };
+
+        const response = await fetch('/api/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ images: imagePayloads })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message);
+
+        // Parsing hasil JSON dari Gemini API
+        const data = JSON.parse(result.data.replace(/```json|```/g, '').trim());
+
+        // Tambah ke tabel log
+        const logBody = document.getElementById("log-body");
+        if (logBody.children[0].children.length === 1) logBody.innerHTML = "";
+
+        const statusClass = data.status === "APPROVED" ? "status-approved" : "status-rejected";
+        const row = `
+          <tr>
+            <td><b>${data.title || '-'}</b><br><small>${data.issuer || '-'}</small></td>
+            <td class="${statusClass}">${data.status}</td>
+            <td>${data.price || '-'}</td>
+            <td>${data.visualScore}%</td>
+            <td>${data.loreScore}%</td>
+          </tr>
+        `;
+        logBody.innerHTML = row + logBody.innerHTML;
+
+        alert(`Evaluasi Selesai! Status: ${data.status}`);
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        btn.innerText = "Evaluasi & Kurasi NFT";
+        btn.disabled = false;
+      }
     }
   </script>
 </body>
