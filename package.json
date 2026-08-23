@@ -1,0 +1,9 @@
+{
+  "name": "nft-dao-validator",
+  "version": "1.0.0",
+  "description": "NFT DAO Validator with Gemini AI",
+  "main": "index.html",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0"
+  }
+}
