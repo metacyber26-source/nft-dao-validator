@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nusantara AI - NFT DAO Validator</title>
+  <title>Nusantara AI - Pi DAO Validator v3.0</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Pi Network SDK -->
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     #settings-panel { display: none !important; }
 
@@ -12,8 +16,8 @@
       --bg-gradient: radial-gradient(circle at 50% -20%, #1e1b4b, #0f172a, #020617);
       --neon-purple: #c084fc;
       --neon-cyan: #22d3ee;
-      --neon-pink: #f43f5e;
-      --glass-bg: rgba(15, 23, 42, 0.7);
+      --neon-yellow: #facc15;
+      --glass-bg: rgba(15, 23, 42, 0.75);
       --glass-border: rgba(192, 132, 252, 0.25);
     }
 
@@ -24,7 +28,7 @@
       color: #f8fafc;
       min-height: 100vh;
       margin: 0;
-      padding: 30px 15px;
+      padding: 25px 15px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -32,84 +36,86 @@
 
     .metaverse-card {
       width: 100%;
-      max-width: 900px;
+      max-width: 950px;
       background: var(--glass-bg);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--glass-border);
       border-radius: 24px;
-      padding: 35px;
+      padding: 30px;
       box-shadow: 0 0 40px rgba(192, 132, 252, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.05);
     }
 
-    .header { text-align: center; margin-bottom: 25px; }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 15px;
+    }
+
     .header h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 26px;
+      font-size: 22px;
       font-weight: 900;
       letter-spacing: 2px;
-      background: linear-gradient(135deg, #a855f7, #38bdf8, #f43f5e);
+      background: linear-gradient(135deg, #a855f7, #38bdf8, #facc15);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-transform: uppercase;
-      margin: 0 0 8px 0;
+      margin: 0 0 5px 0;
     }
+    .header p { color: #94a3b8; font-size: 12px; margin: 0; letter-spacing: 1px; }
 
-    .header p { color: #94a3b8; font-size: 13px; letter-spacing: 1.5px; }
+    /* Tombol Pi Wallet */
+    .wallet-btn {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(250, 204, 21, 0.15);
+      color: var(--neon-yellow);
+      border: 1px solid rgba(250, 204, 21, 0.4);
+      padding: 10px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.2);
+    }
+    .wallet-btn:hover { background: rgba(250, 204, 21, 0.3); box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); }
 
-    /* Upload & Preview Zone */
+    /* Drop Zone */
     .drop-zone {
       border: 2px dashed rgba(56, 189, 248, 0.4);
       border-radius: 16px;
-      padding: 25px 20px;
+      padding: 20px;
       text-align: center;
       background: rgba(2, 6, 23, 0.6);
       cursor: pointer;
       transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
     }
-
-    .drop-zone:hover {
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 25px rgba(34, 211, 238, 0.3);
-      background: rgba(15, 23, 42, 0.85);
-    }
-
+    .drop-zone:hover { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(34, 211, 238, 0.3); }
     .drop-zone input { display: none; }
-    .upload-icon { font-size: 36px; margin-bottom: 8px; display: block; filter: drop-shadow(0 0 10px var(--neon-cyan)); }
+    .upload-icon { font-size: 32px; margin-bottom: 5px; display: block; filter: drop-shadow(0 0 8px var(--neon-cyan)); }
     
-    /* Container Pratinjau Gambar */
     .preview-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       justify-content: center;
-      margin-top: 15px;
+      margin-top: 12px;
     }
-
     .preview-item {
-      width: 85px;
-      height: 85px;
-      border-radius: 10px;
-      overflow: hidden;
-      border: 2px solid var(--neon-cyan);
-      box-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
-      position: relative;
-      background: #000;
+      width: 75px; height: 75px; border-radius: 10px; overflow: hidden;
+      border: 2px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(34, 211, 238, 0.4);
     }
+    .preview-item img { width: 100%; height: 100%; object-fit: cover; }
 
-    .preview-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Tombol Eksekusi Metaverse */
+    /* Tombol Utama */
     .btn-cyber {
       width: 100%;
-      margin-top: 25px;
-      padding: 16px;
+      margin-top: 20px;
+      padding: 15px;
       font-family: 'Orbitron', sans-serif;
       font-size: 15px;
       font-weight: 700;
@@ -123,135 +129,125 @@
       transition: all 0.3s ease;
       text-transform: uppercase;
     }
+    .btn-cyber:hover { transform: translateY(-2px); box-shadow: 0 0 35px rgba(56, 189, 248, 0.7); }
+    .btn-cyber:disabled { background: #334155; box-shadow: none; cursor: not-allowed; }
 
-    .btn-cyber:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 35px rgba(56, 189, 248, 0.7);
-      background: linear-gradient(90deg, #7e22ce, #1d4ed8);
+    /* Panel Hasil AI & Plagiasi */
+    .result-panel {
+      margin-top: 25px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: none;
     }
+    .result-title { font-family: 'Orbitron'; font-size: 14px; color: var(--neon-cyan); margin-bottom: 10px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .metric-card { background: rgba(2, 6, 23, 0.5); padding: 10px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+    .metric-val { font-family: 'Orbitron'; font-size: 16px; font-weight: 700; color: #fff; }
 
-    .btn-cyber:disabled {
-      background: #334155;
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* Table Glassmorphism */
-    .table-container { margin-top: 30px; overflow-x: auto; }
-    .table-title { font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--neon-cyan); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-
+    /* Table Log */
+    .table-container { margin-top: 25px; overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      color: #cbd5e1;
-      padding: 12px;
-      background: rgba(30, 41, 59, 0.85);
-      border-bottom: 2px solid var(--glass-border);
-      text-transform: uppercase;
+      font-family: 'Orbitron', sans-serif; font-size: 10px; color: #cbd5e1;
+      padding: 10px; background: rgba(30, 41, 59, 0.85); border-bottom: 2px solid var(--glass-border);
     }
+    td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
 
-    td { padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 14px; }
-
-    .badge-approved {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-      border: 1px solid rgba(74, 222, 128, 0.3);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-    }
-
-    .badge-rejected {
-      background: rgba(239, 68, 68, 0.15);
-      color: #f87171;
-      border: 1px solid rgba(248, 113, 113, 0.3);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-    }
+    .badge-approved { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3); padding: 3px 8px; border-radius: 20px; font-family: 'Orbitron'; font-size: 9px; font-weight: 700; }
+    .badge-rejected { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.3); padding: 3px 8px; border-radius: 20px; font-family: 'Orbitron'; font-size: 9px; font-weight: 700; }
   </style>
 </head>
 <body>
 
   <div class="metaverse-card">
-    <div class="header">
-      <h1>Nusantara DAO AI Validator</h1>
-      <p>GEMINI 3.6 FLASH • MULTIMODAL AUTO-DETECTION • SUPABASE SYNC</p>
+    <div class="top-bar">
+      <div class="header">
+        <h1>Nusantara DAO AI Validator</h1>
+        <p>GEMINI 3.6 FLASH • PI WALLET AUTH • SUPABASE SYNC</p>
+      </div>
+      <button id="wallet-btn" class="wallet-btn" onclick="connectPiWallet()">🔌 CONNECT PI WALLET</button>
     </div>
 
-    <!-- Drop Zone & Preview SS -->
+    <!-- Drop Zone -->
     <div class="drop-zone" onclick="document.getElementById('ss-files').click()">
       <span class="upload-icon">💎</span>
-      <p id="upload-label" style="margin: 0; font-size: 15px; font-weight: 600;">
-        UNGGAH SCREENSHOT DETAIL & VISUAL
-      </p>
-      <small style="color: #64748b; margin-top: 4px; display: block;">
-        Pilih atau Drop screenshot NFT Anda di sini
-      </small>
-      
-      <!-- Tempat Tampil Pratinjau Gambar -->
+      <p id="upload-label" style="margin: 0; font-size: 14px; font-weight: 600;">UNGGAH SCREENSHOT NFT</p>
+      <small style="color: #64748b; display: block; margin-top: 3px;">Pilih 1 atau 2 screenshot detail NFT</small>
       <div id="preview-box" class="preview-container"></div>
-
       <input type="file" id="ss-files" accept="image/*" multiple onchange="handleFilePreview()">
     </div>
 
-    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">
-      EVALUASI & KURASI NFT
-    </button>
+    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN NEURAL AUDIT & ANTI-PLAGIASI</button>
 
-    <!-- Audit Log -->
+    <!-- Hasil Analisis Instant & Counter-Argument AI -->
+    <div id="result-panel" class="result-panel">
+      <div class="result-title">🛡️ HASIL KURASI AI & COUNTER-ARGUMENT</div>
+      <div class="metrics-grid">
+        <div class="metric-card"><small style="color:#94a3b8">Visual Score</small><div id="res-visual" class="metric-val">-</div></div>
+        <div class="metric-card"><small style="color:#94a3b8">Lore Score</small><div id="res-lore" class="metric-val">-</div></div>
+        <div class="metric-card"><small style="color:#94a3b8">Plagiasi Risk</small><div id="res-plag" class="metric-val" style="color:var(--neon-yellow)">-</div></div>
+      </div>
+      <p id="res-reason" style="font-size: 13px; color: #cbd5e1; margin: 5px 0 0 0; background: rgba(2,6,23,0.4); padding: 10px; border-radius: 8px;"></p>
+    </div>
+
+    <!-- Log Audit Realtime Supabase -->
     <div class="table-container">
-      <div class="table-title">⚡ LOG AUDIT ON-CHAIN REALTIME</div>
+      <div style="font-family:'Orbitron'; font-size: 13px; color: var(--neon-cyan); margin-bottom: 10px;">⚡ LOG AUDIT ON-CHAIN REALTIME</div>
       <table>
         <thead>
           <tr>
             <th>NFT Title & Issuer</th>
             <th>Status</th>
             <th>Harga</th>
-            <th>Visual</th>
-            <th>Lore</th>
+            <th>Wallet / Pelapor</th>
           </tr>
         </thead>
         <tbody id="log-body">
-          <tr>
-            <td colspan="5" style="text-align:center; color:#64748b; padding: 25px;">
-              Belum ada riwayat audit terkini.
-            </td>
-          </tr>
+          <tr><td colspan="4" style="text-align:center; color:#64748b; padding: 20px;">Memuat data dari Supabase...</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
   <script>
+    // Inisialisasi Pi Network SDK
+    const Pi = window.Pi;
+    if (Pi) {
+      Pi.init({ version: "2.0", sandbox: true });
+    }
+
+    let userWallet = "Anonymous-Pioneer";
+
+    async function connectPiWallet() {
+      try {
+        const scopes = ['username', 'payments'];
+        function onIncompletePaymentFound(payment) {}
+        
+        const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
+        userWallet = auth.user.username;
+        document.getElementById('wallet-btn').innerText = `👤 @${userWallet}`;
+        alert(`Berhasil terhubung dengan Pi Wallet: @${userWallet}`);
+      } catch (err) {
+        alert("Gagal koneksi Pi Wallet (Pastikan dibuka di Pi Browser): " + err.message);
+      }
+    }
+
     function handleFilePreview() {
       const files = document.getElementById("ss-files").files;
       const label = document.getElementById("upload-label");
       const previewBox = document.getElementById("preview-box");
-      
-      previewBox.innerHTML = ""; // Bersihkan preview lama
-
+      previewBox.innerHTML = "";
       if (files.length > 0) {
-        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} FILE SCREENSHOT TERPILIH</span>`;
-        
+        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} FILE DIPILIH</span>`;
         for (let i = 0; i < files.length; i++) {
           const reader = new FileReader();
-          reader.onload = function(e) {
-            const div = document.createElement("div");
-            div.className = "preview-item";
-            div.innerHTML = `<img src="${e.target.result}" alt="Preview SS">`;
-            previewBox.appendChild(div);
-          }
+          reader.onload = e => {
+            previewBox.innerHTML += `<div class="preview-item"><img src="${e.target.result}"></div>`;
+          };
           reader.readAsDataURL(files[i]);
         }
-      } else {
-        label.innerText = "UNGGAH SCREENSHOT DETAIL & VISUAL";
       }
     }
 
@@ -267,58 +263,66 @@
     async function prosesEvaluasi() {
       const files = document.getElementById("ss-files").files;
       const btn = document.getElementById("btn-evaluasi");
+      if (files.length < 1) { alert("Pilih minimal 1 screenshot!"); return; }
 
-      if (files.length < 1) {
-        alert("Silakan pilih minimal 1 screenshot NFT terlebih dahulu!");
-        return;
-      }
-
-      btn.innerText = "🌀 MEMPROSES NEURAL AUDIT...";
+      btn.innerText = "🌀 MEMINDAI & VALIDASI...";
       btn.disabled = true;
 
       try {
         const imagePayloads = [];
-        for (let i = 0; i < files.length; i++) {
-          const base64 = await fileToBase64(files[i]);
-          imagePayloads.push(base64);
-        }
+        for (let f of files) imagePayloads.push(await fileToBase64(f));
 
-        const response = await fetch('/api/evaluate', {
+        const res = await fetch('/api/evaluate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ images: imagePayloads })
+          body: JSON.stringify({ images: imagePayloads, wallet: userWallet })
         });
+        
+        const jsonRes = await res.json();
+        if (!res.ok) throw new Error(jsonRes.message);
 
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.message);
+        const data = JSON.parse(jsonRes.data.replace(/```json|```/g, '').trim());
 
-        const data = JSON.parse(result.data.replace(/```json|```/g, '').trim());
+        // Tampilkan Panel Hasil
+        document.getElementById('result-panel').style.display = 'block';
+        document.getElementById('res-visual').innerText = data.visualScore + '%';
+        document.getElementById('res-lore').innerText = data.loreScore + '%';
+        document.getElementById('res-plag').innerText = data.plagiarismRisk || 'Rendah';
+        document.getElementById('res-reason').innerHTML = `<b>Analisis & Counter-Argument DAO:</b> ${data.reason}`;
 
-        const logBody = document.getElementById("log-body");
-        if (logBody.children[0].children.length === 1) logBody.innerHTML = "";
-
-        const statusBadge = data.status === "APPROVED" 
-          ? `<span class="badge-approved">APPROVED</span>` 
-          : `<span class="badge-rejected">REJECTED</span>`;
-
-        const row = `
-          <tr>
-            <td><b>${data.title || 'Untitled'}</b><br><small style="color:#94a3b8">${data.issuer || '-'}</small></td>
-            <td>${statusBadge}</td>
-            <td style="color: var(--neon-cyan); font-weight:700;">${data.price || '0'}</td>
-            <td>${data.visualScore}%</td>
-            <td>${data.loreScore}%</td>
-          </tr>
-        `;
-        logBody.innerHTML = row + logBody.innerHTML;
-
+        loadAuditLogs(); // Refresh tabel Supabase
       } catch (err) {
-        alert("Gagal Evaluasi: " + err.message);
+        alert("Error: " + err.message);
       } finally {
-        btn.innerText = "EVALUASI & KURASI NFT";
+        btn.innerText = "JALANKAN NEURAL AUDIT & ANTI-PLAGIASI";
         btn.disabled = false;
       }
     }
+
+    // Ambil log realtime dari Supabase via API backend
+    async function loadAuditLogs() {
+      try {
+        const res = await fetch('/api/evaluate?action=logs');
+        const json = await res.json();
+        if (json.logs && json.logs.length > 0) {
+          const tbody = document.getElementById('log-body');
+          tbody.innerHTML = "";
+          json.logs.forEach(row => {
+            const badge = row.status === 'APPROVED' ? '<span class="badge-approved">APPROVED</span>' : '<span class="badge-rejected">REJECTED</span>';
+            tbody.innerHTML += `
+              <tr>
+                <td><b>${row.title}</b><br><small style="color:#94a3b8">${row.issuer}</small></td>
+                <td>${badge}</td>
+                <td style="color:var(--neon-cyan); font-weight:700;">${row.price}</td>
+                <td><small>@${row.wallet_address || 'Pioneer'}</small></td>
+              </tr>
+            `;
+          });
+        }
+      } catch (e) { console.error("Gagal load log:", e); }
+    }
+
+    window.onload = loadAuditLogs;
   </script>
 </body>
 </html>
