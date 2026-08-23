@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    // PERBAIKAN DI SINI: Menggunakan gemini-3.6-flash yang aktif
+    // Menggunakan Gemini 3.6 Flash
     const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
 
     const prompt = `
