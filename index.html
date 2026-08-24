@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nusantara AI - Pi DAO Validator AGI v3.6</title>
+  <title>Nusantara AI - Pi DAO Validator AGI v3.6 (Strict 4K & DAO Rules)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -169,8 +169,8 @@
     }
     td { padding: 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 13px; }
 
-    .badge-approved { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 6px 16px; border-radius: 20px; font-family: 'Orbitron'; font-size: 12px; font-weight: 900; letter-spacing: 1px; }
-    .badge-rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); padding: 6px 16px; border-radius: 20px; font-family: 'Orbitron'; font-size: 12px; font-weight: 900; letter-spacing: 1px; }
+    .badge-approve { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.4); padding: 6px 16px; border-radius: 20px; font-family: 'Orbitron'; font-size: 12px; font-weight: 900; letter-spacing: 1px; }
+    .badge-reject { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.4); padding: 6px 16px; border-radius: 20px; font-family: 'Orbitron'; font-size: 12px; font-weight: 900; letter-spacing: 1px; }
   </style>
 </head>
 <body>
@@ -179,7 +179,7 @@
     <div class="top-bar">
       <div class="header">
         <h1>Nusantara AI Validator</h1>
-        <p>GEMINI 3.6 FLASH • 4K ULTRA & STRICT DAO RULES</p>
+        <p>GEMINI 3.6 FLASH • 4K UHD & STRICT DAO & SAFETY RULES</p>
       </div>
       <button id="wallet-btn" class="wallet-btn" onclick="connectPiWallet()">🔌 CONNECT PI WALLET</button>
     </div>
@@ -187,28 +187,28 @@
     <!-- Drop Zone -->
     <div class="drop-zone" onclick="document.getElementById('ss-files').click()">
       <span class="upload-icon">🛡️</span>
-      <p id="upload-label" style="margin: 0; font-size: 14px; font-weight: 600;">UNGGAH NFT (MIN. 4K RESOLUTION & AMAN)</p>
-      <small style="color: #64748b; display: block; margin-top: 3px;">Pilih 1 atau 2 file NFT untuk divalidasi ketat AGI</small>
+      <p id="upload-label" style="margin: 0; font-size: 14px; font-weight: 600;">UNGGAH 2 GAMBAR NFT (MIN. 4K & BEBAS SIMBOL TERLARANG)</p>
+      <small style="color: #64748b; display: block; margin-top: 3px;">Pilih 2 file aset untuk divalidasi kriteria tinggi & aturan DAO</small>
       <div id="preview-box" class="preview-container"></div>
       <input type="file" id="ss-files" accept="image/*" multiple onchange="handleFilePreview()">
     </div>
 
-    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN AGI 4K & STRICT SECURITY SCAN</button>
+    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN AGI 4K & DAO COMPLIANCE SCAN</button>
 
     <!-- Hasil Panel -->
     <div id="result-panel" class="result-panel">
       <div class="result-title">
-        <span>⚡ LAPORAN AUDIT & KEAMANAN AGI</span>
+        <span>⚡ LAPORAN AUDIT & KEPUTUSAN KUALITAS TINGGI</span>
       </div>
       
       <div class="metrics-grid">
-        <div class="metric-card"><small style="color:#94a3b8">Visual</small><div id="res-visual" class="metric-val">-</div></div>
-        <div class="metric-card"><small style="color:#94a3b8">Lore</small><div id="res-lore" class="metric-val">-</div></div>
-        <div class="metric-card"><small style="color:#94a3b8">Resolusi</small><div id="res-res" class="metric-val" style="color:var(--neon-cyan)">-</div></div>
-        <div class="metric-card"><small style="color:#94a3b8">Keamanan</small><div id="res-sec" class="metric-val" style="color:var(--neon-yellow)">-</div></div>
+        <div class="metric-card"><small style="color:#94a3b8">Visual & Estetika</small><div id="res-visual" class="metric-val">-</div></div>
+        <div class="metric-card"><small style="color:#94a3b8">Lore & Konsep</small><div id="res-lore" class="metric-val">-</div></div>
+        <div class="metric-card"><small style="color:#94a3b8">Resolusi 4K</small><div id="res-res" class="metric-val" style="color:var(--neon-cyan)">-</div></div>
+        <div class="metric-card"><small style="color:#94a3b8">Filter Simbol</small><div id="res-sec" class="metric-val" style="color:var(--neon-yellow)">-</div></div>
       </div>
 
-      <!-- KESIMPULAN SKOR & KEPUTUSAN FINAL -->
+      <!-- KESIMPULAN SKOR & STATUS APPROVE / REJECT -->
       <div class="conclusion-box">
         <div>
           <small style="color: #94a3b8; display: block; font-size: 11px; font-family: 'Orbitron';">SKOR GABUNGAN AGI (STANDAR MIN. 80)</small>
@@ -263,7 +263,7 @@
       const previewBox = document.getElementById("preview-box");
       previewBox.innerHTML = "";
       if (files.length > 0) {
-        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} FILE DIPILIH (SIAP SCAN 4K)</span>`;
+        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} FILE DIPILIH (SIAP SCAN KUALITAS TINGGI)</span>`;
         for (let i = 0; i < files.length; i++) {
           const reader = new FileReader();
           reader.onload = e => {
@@ -284,6 +284,7 @@
           img.onload = () => {
             const width = img.width;
             const height = img.height;
+            // Standar Resolusi Tinggi / 4K UHD
             const isHighRes = (width >= 3840 || height >= 2160 || (width >= 2560 && height >= 1440));
             
             const canvas = document.createElement('canvas');
@@ -323,9 +324,12 @@
     async function prosesEvaluasi() {
       const files = document.getElementById("ss-files").files;
       const btn = document.getElementById("btn-evaluasi");
-      if (files.length < 1) { alert("Pilih minimal 1 file NFT!"); return; }
+      if (files.length < 2) { 
+        alert("Harap unggah tepat 2 gambar NFT sesuai instruksi penilaian!"); 
+        return; 
+      }
 
-      btn.innerText = "🛡️ AGI STRICT 4K & SAFETY SCANNING...";
+      btn.innerText = "🛡️ AGI 4K & DAO COMPLIANCE SCANNING...";
       btn.disabled = true;
 
       try {
@@ -362,42 +366,46 @@
 
         const data = jsonRes.data;
 
-        // Penghitungan Skor Gabungan Mutlak dari komponen (Visual, Lore, Kepatuhan DAO & Simbol Terlarang)
-        const vScore = data.visualScore || 60;
-        const lScore = data.loreScore || 60;
+        // Penilaian Berdasarkan Parameter Kualitas Tinggi & Aturan DAO
+        const vScore = data.visualScore || 75;
+        const lScore = data.loreScore || 75;
         const securityThreat = (data.securityThreat || 'Aman').toLowerCase();
         
-        // Rumus Skor Gabungan (Rata-rata tertimbang + penalti jika ada ancaman/simbol berbahaya)
+        // Kalkulasi Skor Gabungan
         let combinedScore = Math.round((vScore * 0.5) + (lScore * 0.5));
-        if (securityThreat !== 'aman' && securityThreat !== 'low') {
-          combinedScore = Math.min(combinedScore, 45); // Penalti otomatis jika terdeteksi simbol/pelanggaran DAO
+        
+        // Aturan Penolakan Otomatis (Simbol Terlarang / Pelanggaran DAO / Resolusi di Bawah 4K)
+        let hasForbiddenSymbols = securityThreat.includes('simbol') || securityThreat.includes('bahaya') || securityThreat.includes('terlarang') || securityThreat.includes('pelanggaran');
+        
+        if (hasForbiddenSymbols) {
+          combinedScore = Math.min(combinedScore, 40);
         }
         if (!minResolutionMet) {
-          combinedScore = Math.min(combinedScore, 70); // Penalti jika resolusi di bawah standar 4K
+          combinedScore = Math.min(combinedScore, 65);
         }
 
-        // Keputusan Final: Minimal skor gabungan 80, resolusi terpenuhi, dan bebas dari simbol berbahaya/pelanggaran DAO
+        // Kriteria APPROVE ketat: Skor Minimal 80, Resolusi 4K Terpenuhi, Tidak Ada Simbol Berbahaya/Terlarang, dan Bebas Pelanggaran DAO
         let finalStatus = 'REJECT';
-        let finalReason = data.reason || 'Evaluasi selesai.';
+        let finalReason = data.reason || 'Evaluasi parameter selesai.';
 
-        if (combinedScore >= 80 && minResolutionMet && (securityThreat === 'aman' || securityThreat === 'low')) {
+        if (combinedScore >= 80 && minResolutionMet && !hasForbiddenSymbols && (securityThreat === 'aman' || securityThreat === 'low')) {
           finalStatus = 'APPROVE';
-          finalReason = `NFT memenuhi seluruh standar kualitas tinggi (Skor Gabungan: ${combinedScore}/100), resolusi 4K valid, serta bebas dari simbol/pelanggaran DAO. ` + finalReason;
+          finalReason = `Aset lolos standar tinggi (Skor Gabungan: ${combinedScore}/100), resolusi 4K UHD terpenuhi, serta bersih dari simbol berbahaya dan aturan DAO. ` + finalReason;
         } else {
           finalStatus = 'REJECT';
           let failureReasons = [];
-          if (combinedScore < 80) failureReasons.push(`Skor gabungan (${combinedScore}) di bawah batas minimum 80`);
-          if (!minResolutionMet) failureReasons.push(`Resolusi di bawah standar minimum 4K`);
-          if (securityThreat !== 'aman' && securityThreat !== 'low') failureReasons.push(`Terdeteksi simbol terlarang atau pelanggaran aturan DAO`);
+          if (combinedScore < 80) failureReasons.push(`Skor gabungan (${combinedScore}) di bawah standar minimum 80`);
+          if (!minResolutionMet) failureReasons.push(`Resolusi di bawah standar minimum 4K UHD`);
+          if (hasForbiddenSymbols) failureReasons.push(`Terdeteksi simbol berbahaya/terlarang atau pelanggaran DAO`);
           
-          finalReason = `Ditolak karena: ${failureReasons.join(', ')}. (${finalReason})`;
+          finalReason = `Ditolak karena: ${failureReasons.join('; ')}. (${finalReason})`;
         }
 
         document.getElementById('result-panel').style.display = 'block';
         document.getElementById('res-visual').innerText = vScore + '%';
         document.getElementById('res-lore').innerText = lScore + '%';
-        document.getElementById('res-res').innerText = minResolutionMet ? '4K Ultra (OK)' : 'Sub-4K (< 4K)';
-        document.getElementById('res-sec').innerText = data.securityThreat || 'Aman';
+        document.getElementById('res-res').innerText = minResolutionMet ? '4K UHD (OK)' : 'Sub-4K (< 4K)';
+        document.getElementById('res-sec').innerText = hasForbiddenSymbols ? 'Terdeteksi Bahaya' : 'Aman (Clean)';
         
         // Tampilkan Skor Gabungan Kesimpulan
         const scoreElem = document.getElementById('res-total-score');
@@ -407,9 +415,9 @@
         // Tampilkan Badge Keputusan Final (APPROVE / REJECT)
         const badgeElem = document.getElementById('res-decision-badge');
         if (finalStatus === 'APPROVE') {
-          badgeElem.innerHTML = `<span class="badge-approved">APPROVE</span>`;
+          badgeElem.innerHTML = `<span class="badge-approve">APPROVE</span>`;
         } else {
-          badgeElem.innerHTML = `<span class="badge-rejected">REJECT</span>`;
+          badgeElem.innerHTML = `<span class="badge-reject">REJECT</span>`;
         }
 
         document.getElementById('res-reason').innerHTML = `<b>Kesimpulan Analisis AGI:</b> ${finalReason}`;
@@ -418,7 +426,7 @@
       } catch (err) {
         alert("Error: " + err.message);
       } finally {
-        btn.innerText = "JALANKAN AGI 4K & STRICT SECURITY SCAN";
+        btn.innerText = "JALANKAN AGI 4K & DAO COMPLIANCE SCAN";
         btn.disabled = false;
       }
     }
@@ -433,7 +441,7 @@
           tbody.innerHTML = "";
           json.logs.forEach(row => {
             const statusUpper = (row.status || '').toUpperCase();
-            const badge = (statusUpper === 'APPROVE' || statusUpper === 'APPROVED') ? '<span class="badge-approved">APPROVE</span>' : '<span class="badge-rejected">REJECT</span>';
+            const badge = statusUpper === 'APPROVE' ? '<span class="badge-approve">APPROVE</span>' : '<span class="badge-reject">REJECT</span>';
             tbody.innerHTML += `
               <tr>
                 <td><b>${row.title}</b><br><small style="color:#94a3b8">${row.issuer}</small></td>
