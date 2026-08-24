@@ -266,13 +266,12 @@
           body: JSON.stringify({ images: imagePayloads, wallet: userWallet })
         });
 
-        // Ambil text mentah terlebih dahulu untuk cegah JSON crash jika backend mengembalikan HTML error
         const textRes = await res.text();
         let jsonRes;
         try {
           jsonRes = JSON.parse(textRes);
         } catch (e) {
-          throw new Error("Respon Backend Vercel Error: " + textRes.substring(0, 100));
+          throw new Error("Respon Server Error: " + textRes.substring(0, 100));
         }
 
         if (!res.ok) throw new Error(jsonRes.message || "Gagal melakukan evaluasi.");
@@ -286,7 +285,6 @@
         document.getElementById('res-sec').innerText = data.securityThreat || 'Aman';
         document.getElementById('res-reason').innerHTML = `<b>Analisis & Counter-Argument AGI:</b> ${data.reason}`;
 
-        // Tambahkan baris baru ke tabel langsung
         const tbody = document.getElementById('log-body');
         if (tbody.children[0] && tbody.children[0].children.length === 1) tbody.innerHTML = "";
         const badge = data.status === 'APPROVED' ? '<span class="badge-approved">APPROVED</span>' : '<span class="badge-rejected">REJECTED</span>';
@@ -335,4 +333,3 @@
   </script>
 </body>
 </html>
-i
