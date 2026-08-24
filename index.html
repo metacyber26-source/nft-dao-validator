@@ -239,7 +239,6 @@
       }
     }
 
-    // Mengompres gambar secara otomatis agar tidak over-payload Vercel Serverless (Max 1024px)
     function compressImage(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -268,7 +267,6 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Konversi ke Base64 JPEG ringan (quality 0.75)
             const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
             resolve(dataUrl.split(',')[1]);
           };
