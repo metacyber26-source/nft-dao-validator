@@ -54,8 +54,8 @@ export default async function handler(req, res) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Model Gemini terbaru yang didukung stabil
-    const modelNames = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-pro"];
+    // Menggunakan gemini-3.6-flash sesuai permintaan dan instruksi API Google
+    const modelNames = ["gemini-3.6-flash", "gemini-1.5-flash", "gemini-pro"];
     let model = null;
     let lastError = null;
 
@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     }
 
     if (!model) {
-      throw new Error("Gagal menginisialisasi model Gemini: " + (lastError?.message || "Unknown error"));
+      model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
     }
 
     const prompt = `
@@ -137,7 +137,7 @@ export default async function handler(req, res) {
       };
     }
 
-    // Simpan ke Supabase jika tabel tersedia (tidak membuat fungsi crash jika tabel belum ada)
+    // Simpan ke Supabase jika tabel tersedia
     if (supabase) {
       try {
         await supabase.from('nft_audits').insert([{
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
           wallet_address: wallet || 'Anonymous'
         }]);
       } catch (dbErr) {
-        console.warn("Catatan Supabase gagal disimpan (tabel mungkin belum dibuat):", dbErr.message);
+        console.warn("Catatan Supabase gagal disimpan:", dbErr.message);
       }
     }
 
