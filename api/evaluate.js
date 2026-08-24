@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
 
-// Safe Inisialisasi Supabase
 let supabase = null;
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   try {
@@ -14,7 +13,6 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
 export default async function handler(req, res) {
   res.setHeader('Content-Type', 'application/json');
 
-  // Route GET Log Audit Supabase
   if (req.method === 'GET' && req.query.action === 'logs') {
     if (!supabase) return res.status(200).json({ logs: [] });
     try {
@@ -26,7 +24,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ status: "error", message: "Method Method Not Allowed" });
+    return res.status(405).json({ status: "error", message: "Method Not Allowed" });
   }
 
   try {
@@ -42,13 +40,19 @@ export default async function handler(req, res) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    // Menggunakan Gemini 3.6 Flash
-    const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
+    
+    // Menggunakan gemini-3.6-flash dengan konfigurasi aman
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-3.6-flash",
+      generationConfig: {
+        responseMimeType: "application/json"
+      }
+    });
 
     const prompt = `
       Anda adalah AGI Core Security & Validator AI untuk Nusantara DAO NFT. 
-      Lakukan analisis & pemindaian tingkat lanjut (AGI Multi-modal Security Scan) pada screenshot PiBox yang diberikan:
-      1. FILTER SIMBOL BERBAHAYA / TERLARANG: Periksa dengan sangat teliti apakah terdapat simbol terlarang, ujaran kebencian, konten terlarang, QR/barcode tersembunyi yang mencurigakan, atau visual berbahaya.
+      Lakukan analisis & pemindaian tingkat lanjut (AGI Multi-modal Security Scan) pada screenshot yang diberikan:
+      1. FILTER SIMBOL BERBAHAYA / TERLARANG: Periksa dengan sangat teliti apakah terdapat simbol terlarang, ujaran kebencian, atribut berbahaya, QR/barcode tersembunyi yang mencurigakan, atau malware visual.
       2. Ekstrak data: Title, Issuer, Price, Description.
       3. Nilai kualitas visual (0-100) dan lore/deskripsi (0-100).
       4. Cek risiko plagiasi (Rendah / Sedang / Tinggi).
@@ -57,8 +61,7 @@ export default async function handler(req, res) {
          - Jika terdeteksi simbol berbahaya/terlarang ATAU ancaman keamanan ATAU risiko plagiasi tinggi, status WAJIB "REJECTED".
          - Status "APPROVED" HANYA diberikan jika gambar 100% aman, bersih, dan rata-rata skor >= 75.
 
-      SANGAT PENTING: Kembalikan HANYA format JSON valid murni tanpa format Markdown block atau kata-kata tambahan.
-      Format JSON:
+      Kembalikan HANYA format JSON valid dengan struktur kunci berikut:
       {
         "title": "Judul NFT",
         "issuer": "Nama Pembuat",
@@ -78,25 +81,16 @@ export default async function handler(req, res) {
       contentParts.push({
         inlineData: {
           data: img,
-          mimeType: "image/png"
+          mimeType: "image/jpeg"
         }
       });
     });
 
     const result = await model.generateContent(contentParts);
-    let responseText = await result.response.text();
+    const responseText = await result.response.text();
     
-    // Pembersihan ketat penulisan JSON dari Gemini
-    responseText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
-    const jsonStartIndex = responseText.indexOf('{');
-    const jsonEndIndex = responseText.lastIndexOf('}');
-    if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
-      responseText = responseText.substring(jsonStartIndex, jsonEndIndex + 1);
-    }
-
     const parsedData = JSON.parse(responseText);
 
-    // Simpan ke Supabase jika terkonfigurasi (tanpa memblokir respon jika terjadi error)
     if (supabase) {
       try {
         await supabase.from('nft_audits').insert([{
