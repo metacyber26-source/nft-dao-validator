@@ -3,12 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nusantara AI - Pi DAO Validator AGI v3.5</title>
+  <title>Nusantara AI - Pi DAO Validator AGI v3.6</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
-  <!-- Supabase JS Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     #settings-panel { display: none !important; }
 
@@ -177,7 +175,7 @@
 
     <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN AGI NEURAL & SECURITY SCAN</button>
 
-    <!-- Hasil Panel & Counter Argument -->
+    <!-- Hasil Panel -->
     <div id="result-panel" class="result-panel">
       <div class="result-title">⚡ LAPORAN AUDIT & KEAMANAN AGI</div>
       <div class="metrics-grid">
@@ -267,11 +265,19 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ images: imagePayloads, wallet: userWallet })
         });
-        
-        const jsonRes = await res.json();
-        if (!res.ok) throw new Error(jsonRes.message);
 
-        const data = JSON.parse(jsonRes.data.replace(/```json|```/g, '').trim());
+        // Ambil text mentah terlebih dahulu untuk cegah JSON crash jika backend mengembalikan HTML error
+        const textRes = await res.text();
+        let jsonRes;
+        try {
+          jsonRes = JSON.parse(textRes);
+        } catch (e) {
+          throw new Error("Respon Backend Vercel Error: " + textRes.substring(0, 100));
+        }
+
+        if (!res.ok) throw new Error(jsonRes.message || "Gagal melakukan evaluasi.");
+
+        const data = jsonRes.data;
 
         document.getElementById('result-panel').style.display = 'block';
         document.getElementById('res-visual').innerText = data.visualScore + '%';
@@ -279,6 +285,19 @@
         document.getElementById('res-plag').innerText = data.plagiarismRisk || 'Rendah';
         document.getElementById('res-sec').innerText = data.securityThreat || 'Aman';
         document.getElementById('res-reason').innerHTML = `<b>Analisis & Counter-Argument AGI:</b> ${data.reason}`;
+
+        // Tambahkan baris baru ke tabel langsung
+        const tbody = document.getElementById('log-body');
+        if (tbody.children[0] && tbody.children[0].children.length === 1) tbody.innerHTML = "";
+        const badge = data.status === 'APPROVED' ? '<span class="badge-approved">APPROVED</span>' : '<span class="badge-rejected">REJECTED</span>';
+        tbody.innerHTML = `
+          <tr>
+            <td><b>${data.title || 'Untitled'}</b><br><small style="color:#94a3b8">${data.issuer || '-'}</small></td>
+            <td>${badge}</td>
+            <td style="color:var(--neon-cyan); font-weight:700;">${data.price || '0'}</td>
+            <td><small>@${userWallet}</small></td>
+          </tr>
+        ` + tbody.innerHTML;
 
         loadAuditLogs();
       } catch (err) {
@@ -292,6 +311,7 @@
     async function loadAuditLogs() {
       try {
         const res = await fetch('/api/evaluate?action=logs');
+        if(!res.ok) return;
         const json = await res.json();
         if (json.logs && json.logs.length > 0) {
           const tbody = document.getElementById('log-body');
@@ -315,3 +335,4 @@
   </script>
 </body>
 </html>
+i
