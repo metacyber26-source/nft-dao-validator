@@ -1,7 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
 
-// Safe Inisialisasi Supabase
 let supabase = null;
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   try {
@@ -12,10 +11,8 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
 }
 
 export default async function handler(req, res) {
-  // Pastikan respon selalu JSON
   res.setHeader('Content-Type', 'application/json');
 
-  // Handle route GET log audit Supabase
   if (req.method === 'GET' && req.query.action === 'logs') {
     if (!supabase) return res.status(200).json({ logs: [] });
     try {
@@ -44,11 +41,20 @@ export default async function handler(req, res) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Gunakan model gemini-3.6-flash dengan fallback aman
+    // Model fallback otomatis yang paling stabil di serverless
     let model;
-    try {
-      model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" });
-    } catch (e) {
+    const modelsToTry = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-pro-vision"];
+    
+    for (const mName of modelsToTry) {
+      try {
+        model = genAI.getGenerativeModel({ model: mName });
+        break;
+      } catch (err) {
+        continue;
+      }
+    }
+
+    if (!model) {
       model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     }
 
@@ -64,7 +70,7 @@ export default async function handler(req, res) {
          - Jika terdeteksi simbol berbahaya/terlarang ATAU ancaman keamanan ATAU risiko plagiasi tinggi, status WAJIB "REJECTED".
          - Status "APPROVED" HANYA diberikan jika gambar 100% aman, bersih, dan rata-rata skor >= 75.
 
-      SANGAT PENTING: Kembalikan HANYA JSON MURNI tanpa markdown (tanpa backtick ```), persis dengan format berikut:
+      SANGAT PENTING: Kembalikan HANYA JSON MURNI tanpa markdown (tanpa backtick), persis dengan format berikut:
       {
         "title": "Judul NFT",
         "issuer": "Nama Pembuat",
@@ -92,7 +98,6 @@ export default async function handler(req, res) {
     const result = await model.generateContent(contentParts);
     let responseText = await result.response.text();
 
-    // Sanitasi JSON secara aman
     responseText = responseText.replace(/```json/gi, '').replace(/```/g, '').trim();
     const firstBrace = responseText.indexOf('{');
     const lastBrace = responseText.lastIndexOf('}');
@@ -118,7 +123,6 @@ export default async function handler(req, res) {
       };
     }
 
-    // Simpan ke Supabase jika terkonfigurasi
     if (supabase) {
       try {
         await supabase.from('nft_audits').insert([{
