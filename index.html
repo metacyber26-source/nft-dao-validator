@@ -227,21 +227,22 @@
       </select>
     </div>
 
-    <!-- Drop Zone -->
+    <!-- Drop Zone (Diperbarui teks deskripsinya ke 75) -->
     <div class="drop-zone" onclick="document.getElementById('ss-files').click()">
       <span class="upload-icon">🛡️</span>
       <p id="upload-label" style="margin: 0; font-size: 14px; font-weight: 600;">UNGGAH ASET NFT (2D / 3D WEB3 STANDARDS)</p>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Pilih aset untuk Tahap 1 (Filter Mutlak) & Tahap 2 (Skor Min. 75 per Parameter)</p>
       <small id="upload-sub-label" style="color: #64748b; display: block; margin-top: 3px;">Format 2D: PNG, WEBP, SVG (Min. 4K: 3840x2160)</small>
       <div id="preview-box" class="preview-container"></div>
       <input type="file" id="ss-files" accept="image/*,.glb,.gltf,.fbx,.obj" multiple onchange="handleFilePreview()">
     </div>
 
-    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN AGI NEURAL & SECURITY SCAN</button>
+    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN 10 PARAMETER AGI SCAN</button>
 
     <!-- Hasil Panel -->
     <div id="result-panel" class="result-panel">
       <div class="result-title">
-        <span>⚡ LAPORAN AUDIT & KELAYAKAN 10 PARAMETER AGI (TERSTRUKTUR)</span>
+        <span>⚡ LAPORAN AUDIT 10 PARAMETER STANDAR KUALITAS & KELAYAKAN</span>
       </div>
       
       <!-- Detail 10 Parameter Penilaian -->
@@ -318,7 +319,7 @@
       const previewBox = document.getElementById("preview-box");
       previewBox.innerHTML = "";
       if (files.length > 0) {
-        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} BERKAS TERDETEKSI & SIAP DIVALIDASI</span>`;
+        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} BERKAS DIPILIH (SIAP VALIDASI 10 PARAMETER)</span>`;
         for (let i = 0; i < files.length; i++) {
           const file = files[i];
           if (file.type.startsWith('image/')) {
@@ -505,7 +506,6 @@
         let finalStatus = 'REJECT';
         let finalReason = data.reason || 'Selesai diproses.';
 
-        // PENYESUAIAN STANDAR MINIMUM SKOR DARI 80 MENJADI 75
         if (!hasAbsoluteViolation && combinedScore >= 75 && allResMet) {
           finalStatus = 'APPROVE';
           finalReason = `Aset ${assetType.toUpperCase()} sukses memenuhi standar Tahap 1 & 2. Skor gabungan mencapai ${combinedScore}/100 sesuai spesifikasi teknis Web3 yang berlaku.`;
@@ -548,7 +548,7 @@
       } catch (err) {
         alert("Error: " + err.message);
       } finally {
-        btn.innerText = "JALANKAN AGI NEURAL & SECURITY SCAN";
+        btn.innerText = "JALANKAN 10 PARAMETER AGI SCAN";
         btn.disabled = false;
       }
     }
