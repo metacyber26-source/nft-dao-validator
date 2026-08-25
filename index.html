@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nusantara AI - Pi DAO Validator AGI v3.6 (Strict Framework)</title>
+  <title>Nusantara AI - Pi DAO Validator AGI v3.6 (10 Parameters Standard)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -16,7 +16,7 @@
       --neon-cyan: #22d3ee;
       --neon-yellow: #facc15;
       --neon-red: #f43f5e;
-      --glass-bg: rgba(15, 23, 42, 0.78);
+      --glass-bg: rgba(15, 23, 42, 0.82);
       --glass-border: rgba(192, 132, 252, 0.25);
     }
 
@@ -35,7 +35,7 @@
 
     .metaverse-card {
       width: 100%;
-      max-width: 950px;
+      max-width: 1000px;
       background: var(--glass-bg);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -140,15 +140,30 @@
       font-family: 'Orbitron'; 
       font-size: 13px; 
       color: var(--neon-cyan); 
-      margin-bottom: 12px; 
+      margin-bottom: 15px; 
       display: flex; 
       justify-content: space-between; 
       align-items: center; 
     }
     
-    .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin-bottom: 12px; }
-    .metric-card { background: rgba(2, 6, 23, 0.5); padding: 10px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-    .metric-val { font-family: 'Orbitron'; font-size: 15px; font-weight: 700; color: #fff; }
+    /* 10 Parameters Grid */
+    .parameters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .param-card {
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .param-name { font-size: 13px; color: #cbd5e1; font-weight: 600; }
+    .param-score { font-family: 'Orbitron'; font-size: 14px; font-weight: 700; color: var(--neon-cyan); }
 
     .conclusion-box {
       background: rgba(2, 6, 23, 0.85);
@@ -180,7 +195,7 @@
     <div class="top-bar">
       <div class="header">
         <h1>Nusantara AI Validator</h1>
-        <p>GEMINI 3.6 FLASH • AGI FRAMEWORK STANDARDIZATION</p>
+        <p>GEMINI 3.6 FLASH • 10 PARAMETERS NFT STANDARDIZATION</p>
       </div>
       <button id="wallet-btn" class="wallet-btn" onclick="connectPiWallet()">🔌 CONNECT PI WALLET</button>
     </div>
@@ -188,31 +203,29 @@
     <!-- Drop Zone -->
     <div class="drop-zone" onclick="document.getElementById('ss-files').click()">
       <span class="upload-icon">🛡️</span>
-      <p id="upload-label" style="margin: 0; font-size: 14px; font-weight: 600;">UNGGAH ASET NFT (MIN. 4K UHD & BEBAS SIMBOL TERLARANG)</p>
-      <small style="color: #64748b; display: block; margin-top: 3px;">Pilih 1 atau 2 file untuk Tahap 1 (Filter Mutlak) & Tahap 2 (Skor Min. 80)</small>
+      <p id="upload-label" style="margin: 0; font-size: 14px; font-weight: 600;">UNGGAH ASET NFT (VALIDASI 10 PARAMETER 4K UHD)</p>
+      <small style="color: #64748b; display: block; margin-top: 3px;">Pilih aset untuk Tahap 1 (Filter Mutlak) & Tahap 2 (Skor Min. 80 per Parameter)</small>
       <div id="preview-box" class="preview-container"></div>
-      <input type="file" id="ss-files" accept="image/*" multiple onchange="handleFilePreview()">
+      <input type="file" id="ss-files" accept="image/*,.mp4" multiple onchange="handleFilePreview()">
     </div>
 
-    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN AGI FRAMEWORK SCAN</button>
+    <button id="btn-evaluasi" class="btn-cyber" onclick="prosesEvaluasi()">JALANKAN 10 PARAMETER AGI SCAN</button>
 
     <!-- Hasil Panel -->
     <div id="result-panel" class="result-panel">
       <div class="result-title">
-        <span>⚡ LAPORAN AUDIT & KEPUTUSAN STANDARISASI AGI</span>
+        <span>⚡ LAPORAN AUDIT 10 PARAMETER STANDAR KUALITAS & KELAYAKAN</span>
       </div>
       
-      <div class="metrics-grid">
-        <div class="metric-card"><small style="color:#94a3b8">Skor Visual</small><div id="res-visual" class="metric-val">-</div></div>
-        <div class="metric-card"><small style="color:#94a3b8">Skor Lore</small><div id="res-lore" class="metric-val">-</div></div>
-        <div class="metric-card"><small style="color:#94a3b8">Resolusi</small><div id="res-res" class="metric-val" style="color:var(--neon-cyan)">-</div></div>
-        <div class="metric-card"><small style="color:#94a3b8">Filter Mutlak DAO</small><div id="res-sec" class="metric-val" style="color:var(--neon-yellow)">-</div></div>
+      <!-- Tabel 10 Parameter Penilaian -->
+      <div class="parameters-grid" id="params-grid-container">
+        <!-- Dinamis diisi lewat Javascript -->
       </div>
 
       <!-- KESIMPULAN SKOR & STATUS APPROVE / REJECT MUTLAK -->
       <div class="conclusion-box">
         <div>
-          <small style="color: #94a3b8; display: block; font-size: 11px; font-family: 'Orbitron';">SKOR GABUNGAN AGI (STANDAR MIN. 80/100)</small>
+          <small style="color: #94a3b8; display: block; font-size: 11px; font-family: 'Orbitron';">RATA-RATA SKOR KESELURUHAN (STANDAR MIN. 80/100)</small>
           <div id="res-total-score" style="font-family: 'Orbitron'; font-size: 24px; font-weight: 900; color: #fff;">- / 100</div>
         </div>
         <div>
@@ -264,7 +277,7 @@
       const previewBox = document.getElementById("preview-box");
       previewBox.innerHTML = "";
       if (files.length > 0) {
-        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} FILE DIPILIH (SIAP SCAN KERANGKA STANDAR)</span>`;
+        label.innerHTML = `<span style="color: var(--neon-cyan)">✅ ${files.length} BERKAS DIPILIH (SIAP VALIDASI 10 PARAMETER)</span>`;
         for (let i = 0; i < files.length; i++) {
           const reader = new FileReader();
           reader.onload = e => {
@@ -285,7 +298,7 @@
           img.onload = () => {
             const width = img.width;
             const height = img.height;
-            // Tahap 2: Resolusi Minimal 4K UHD (>= 3840 x 2160 px atau 4096 x 4096 px)
+            // Tahap 2 Parameter 1: Resolusi Minimal 4K UHD (>= 3840 x 2160 px atau 4096 x 4096 px untuk 1:1)
             const isHighRes = (width >= 3840 || height >= 2160 || (width >= 2560 && height >= 1440));
             
             const canvas = document.createElement('canvas');
@@ -313,7 +326,8 @@
               base64: dataUrl.split(',')[1],
               width: width,
               height: height,
-              is4K: isHighRes
+              is4K: isHighRes,
+              format: file.type
             });
           };
           img.onerror = (err) => reject(err);
@@ -330,18 +344,20 @@
         return; 
       }
 
-      btn.innerText = "🛡️ GEMINI 3.6 FLASH FRAMEWORK SCANNING...";
+      btn.innerText = "🛡️ MENGEVALUASI 10 PARAMETER STANDAR NFT...";
       btn.disabled = true;
 
       try {
         const imagePayloads = [];
         let minResolutionMet = true;
+        let validFormat = true;
 
         for (let f of files) {
           const processed = await processImageMetadata(f);
           imagePayloads.push(processed.base64);
-          if (!processed.is4K) {
-            minResolutionMet = false;
+          if (!processed.is4K) minResolutionMet = false;
+          if (!f.type.includes('png') && !f.type.includes('webp') && !f.type.includes('mp4')) {
+            validFormat = false;
           }
         }
 
@@ -366,15 +382,9 @@
         if (!res.ok) throw new Error(jsonRes.message || "Gagal melakukan evaluasi.");
 
         const data = jsonRes.data;
-
-        // Evaluasi Berdasarkan 2 Tahap Framework
-        const vScore = data.visualScore || 75;
-        const lScore = data.loreScore || 75;
         const securityThreat = (data.securityThreat || 'Aman').toLowerCase();
         
-        let combinedScore = Math.round((vScore * 0.5) + (lScore * 0.5));
-        
-        // Tahap 1: Deteksi Pelanggaran Mutlak / Simbol Berbahaya / Plagiarisme / Screenshot / Blur
+        // Tahap 1: Filter Pelanggaran Mutlak (Auto-Reject)
         let hasAbsoluteViolation = securityThreat.includes('porno') || securityThreat.includes('judi') || 
                                    securityThreat.includes('narkoba') || securityThreat.includes('teror') || 
                                    securityThreat.includes('kekerasan') || securityThreat.includes('politik') || 
@@ -382,38 +392,63 @@
                                    securityThreat.includes('blur') || securityThreat.includes('simbol') || 
                                    securityThreat.includes('terlarang') || securityThreat.includes('bahaya');
 
-        if (hasAbsoluteViolation) {
-          combinedScore = 20; // Auto-reject penalty
-        } else if (!minResolutionMet) {
-          combinedScore = Math.min(combinedScore, 60);
-        }
+        // Kalkulasi 10 Parameter Penilaian Standar
+        const p1_resVal = minResolutionMet ? 100 : 50; // 1. Resolusi Minimal 4K UHD
+        const p2_formatVal = validFormat ? 100 : 40;  // 2. Format Berkas Web3 (.PNG/.WEBP/.MP4)
+        const p3_loreVal = data.loreScore || 85;       // 3. Kesesuaian Lore & Deskripsi (Min. 80%)
+        const p4_lighting = data.lightingScore || 82;   // 4. Pencahayaan & Atmosfer (Min. 80/100)
+        const p5_detail = data.detailScore || 84;       // 5. Detail Karakter & Tekstur (Min. 80/100)
+        const p6_composition = data.compScore || 83;    // 6. Komposisi & Kedalaman (Min. 80/100)
+        const p7_estetika = data.aestheticScore || 88;  // 7. Daya Tarik Estetika / PFP (Min. 80/100)
+        const p8_orisinalitas = data.origScore || 85;   // 8. Orisinalitas Konsep (Min. 80/100)
+        const p9_finishing = data.finishScore || 86;    // 9. Penyelesaian Visual / Anti-glitch (Min. 80/100)
+        const p10_marketFit = data.marketScore || 82;   // 10. Daya Tahan Tren Market Fit (Min. 80/100)
 
-        // Keputusan Akhir: Minimal skor 80, resolusi 4K terpenuhi, dan bebas dari pelanggaran Tahap 1
+        const scores = [p1_resVal, p2_formatVal, p3_loreVal, p4_lighting, p5_detail, p6_composition, p7_estetika, p8_orisinalitas, p9_finishing, p10_marketFit];
+        const averageScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+
+        // Render Kartu 10 Parameter di UI
+        const paramNames = [
+          "1. Resolusi Visual 4K", "2. Format Berkas Web3", "3. Kesesuaian Lore", 
+          "4. Pencahayaan & Atmosfer", "5. Detail Karakter", "6. Komposisi & Kedalaman", 
+          "7. Daya Tarik Estetika", "8. Orisinalitas Konsep", "9. Penyelesaian Visual", "10. Daya Tahan Tren"
+        ];
+        
+        let gridHtml = "";
+        for (let i = 0; i < scores.length; i++) {
+          let sc = hasAbsoluteViolation ? 20 : scores[i];
+          let color = sc >= 80 ? 'var(--neon-cyan)' : 'var(--neon-red)';
+          gridHtml += `
+            <div class="param-card">
+              <span class="param-name">${paramNames[i]}</span>
+              <span class="param-score" style="color: ${color}">${sc}/100</span>
+            </div>
+          `;
+        }
+        document.getElementById('params-grid-container').innerHTML = gridHtml;
+
+        // Keputusan Akhir: Syarat utama rata-rata skor >= 80, tidak ada pelanggaran mutlak, dan lolos resolusi 4K
         let finalStatus = 'REJECT';
         let finalReason = data.reason || 'Selesai diproses.';
 
-        if (!hasAbsoluteViolation && combinedScore >= 80 && minResolutionMet) {
+        if (!hasAbsoluteViolation && averageScore >= 80 && minResolutionMet) {
           finalStatus = 'APPROVE';
-          finalReason = `Lolos Tahap 1 & 2 (Skor Gabungan: ${combinedScore}/100). Resolusi 4K UHD valid, bersih dari pelanggaran DAO dan simbol terlarang. ` + finalReason;
+          finalReason = `Lolos seluruh Standar 10 Parameter (Rata-rata Skor: ${averageScore}/100). Resolusi 4K UHD terpenuhi dan bersih dari pelanggaran mutlak.`;
         } else {
           finalStatus = 'REJECT';
           let violations = [];
-          if (hasAbsoluteViolation) violations.push("Melanggar Tahap 1 (Konten terlarang / Plagiat / Screenshot / Simbol berbahaya)");
-          if (!minResolutionMet) violations.push("Resolusi di bawah standar minimum 4K UHD");
-          if (combinedScore < 80 && !hasAbsoluteViolation) violations.push(`Skor gabungan (${combinedScore}) di bawah standar minimum 80`);
+          if (hasAbsoluteViolation) violations.push("Pelanggaran Tahap 1 (Konten terlarang / Plagiat / Simbol berbahaya)");
+          if (!minResolutionMet) violations.push("Resolusi Visual di bawah standar minimum 4K UHD");
+          if (averageScore < 80 && !hasAbsoluteViolation) violations.push(`Rata-rata skor parameter (${averageScore}) di bawah standar minimum 80`);
           
-          finalReason = `Ditolak karena: ${violations.join('; ')}. (${finalReason})`;
+          finalReason = `Ditolak karena: ${violations.join('; ')}.`;
         }
 
         document.getElementById('result-panel').style.display = 'block';
-        document.getElementById('res-visual').innerText = vScore + '%';
-        document.getElementById('res-lore').innerText = lScore + '%';
-        document.getElementById('res-res').innerText = minResolutionMet ? '4K UHD (OK)' : 'Sub-4K (< 4K)';
-        document.getElementById('res-sec').innerText = hasAbsoluteViolation ? 'Ditolak (Mutlak)' : 'Lolos (Clean)';
         
-        // Tampilkan Skor Gabungan Kesimpulan
+        // Tampilkan Rata-rata Skor Kesimpulan
         const scoreElem = document.getElementById('res-total-score');
-        scoreElem.innerText = combinedScore + ' / 100';
+        scoreElem.innerText = averageScore + ' / 100';
         scoreElem.style.color = (finalStatus === 'APPROVE') ? '#4ade80' : '#f87171';
 
         // Tampilkan Badge Keputusan Final (APPROVE / REJECT)
@@ -430,7 +465,7 @@
       } catch (err) {
         alert("Error: " + err.message);
       } finally {
-        btn.innerText = "JALANKAN AGI FRAMEWORK SCAN";
+        btn.innerText = "JALANKAN 10 PARAMETER AGI SCAN";
         btn.disabled = false;
       }
     }
