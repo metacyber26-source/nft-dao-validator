@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nusantara AI - Pi DAO Validator AGI v3.7 (Optimized Threshold)</title>
+  <title>Nusantara AI - Pi DAO Validator AGI v3.7 (2D vs 3D Framework)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <!-- Pi Network SDK -->
   <script src="https://sdk.minepi.com/pi-sdk.js"></script>
@@ -455,14 +455,14 @@
                                    securityThreat.includes('blur') || securityThreat.includes('simbol');
 
         let p1_res = allResMet ? 95 : 50;
-        let p2_format = 92; 
+        let p2_format = 92;
         let p3_lore = data.loreScore || 85;
         let p4_lighting = data.visualScore || 82;
-        let p5_detail = assetType === '2d' ? (data.detailScore || 84) : 88; 
+        let p5_detail = assetType === '2d' ? (data.detailScore || 84) : 88;
         let p6_composition = data.compScore || 83;
         let p7_aesthetic = data.aestheticScore || 86;
         let p8_originality = data.originalityScore || 85;
-        let p9_finishing = assetType === '2d' ? (data.finishingScore || 82) : 90; 
+        let p9_finishing = assetType === '2d' ? (data.finishingScore || 82) : 90;
         let p10_market = data.marketScore || 84;
 
         if (hasAbsoluteViolation) {
@@ -505,15 +505,15 @@
         let finalStatus = 'REJECT';
         let finalReason = data.reason || 'Selesai diproses.';
 
-        // PENYESUAIAN AMBANG BATAS MINIMUM MENJADI 75
+        // PENYESUAIAN STANDAR MINIMUM SKOR DARI 80 MENJADI 75
         if (!hasAbsoluteViolation && combinedScore >= 75 && allResMet) {
           finalStatus = 'APPROVE';
-          finalReason = `Aset ${assetType.toUpperCase()} sukses memenuhi standar Tahap 1 & 2. Skor gabungan mencapai ${combinedScore}/100 (Melampaui batas minimum 75).`;
+          finalReason = `Aset ${assetType.toUpperCase()} sukses memenuhi standar Tahap 1 & 2. Skor gabungan mencapai ${combinedScore}/100 sesuai spesifikasi teknis Web3 yang berlaku.`;
         } else {
           let violations = [];
           if (hasAbsoluteViolation) violations.push("Pelanggaran Tahap 1 (Konten terlarang / Plagiarisme / Simbolik)");
           if (!allResMet) violations.push(`Resolusi aset ${assetType.toUpperCase()} di bawah standar minimum`);
-          if (combinedScore < 75 && !hasAbsoluteViolation) violations.push(`Skor total (${combinedScore}) di bawah ambang batas minimum 75/100`);
+          if (combinedScore < 75 && !hasAbsoluteViolation) violations.push(`Skor total (${combinedScore}) di bawah ambang batas 75/100`);
           
           finalReason = `DITOLAK KARENA: ${violations.join('; ')}.`;
         }
